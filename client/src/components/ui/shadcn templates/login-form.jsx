@@ -10,6 +10,7 @@ import { NavLink } from "react-router";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
 import { registerValidationRules } from "@/utils/form-validations";
+import axios from "axios";
 
 export function LoginForm({ className, ...props }) {
   const {
@@ -18,8 +19,19 @@ export function LoginForm({ className, ...props }) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        data,
+      );
+
+      if (response) console.log(response.data.message);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const loginValidationRule = {
