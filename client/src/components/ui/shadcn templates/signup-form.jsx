@@ -2,19 +2,31 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/shadcn templates/button";
 import { Card, CardContent } from "@/components/ui/shadcn templates/card";
 import {
-  Field,
   FieldDescription,
   FieldGroup,
   FieldSeparator,
 } from "@/components/ui/shadcn templates/field";
 import CustomField from "../../Common/CustomField";
+import { useForm } from "react-hook-form";
+import { registerValidationRules } from "@/utils/form-validations";
+import { NavLink } from "react-router";
 
 export function SignupForm({ className, ...props }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create your account</h1>
@@ -29,6 +41,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="name"
                   inputType="text"
                   inputPlaceHolder="Max Leiter"
+                  error={errors.name}
+                  {...register("name", registerValidationRules.name)}
+                  aria-invalid={errors.name ? true : false}
                 />
                 <CustomField
                   fieldLabel="Username"
@@ -36,7 +51,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="username"
                   inputType="text"
                   inputPlaceHolder="max-leiter"
-                  // fieldDescription="Choose a unique username for your account."
+                  error={errors.username}
+                  {...register("username", registerValidationRules.username)}
+                  aria-invalid={errors.username ? true : false}
                 />
               </FieldGroup>
               <FieldGroup className="grid max-w-sm grid-cols-1 md:grid-cols-2 gap-2">
@@ -46,7 +63,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="mobile"
                   inputType="tel"
                   inputPlaceHolder="9966331188"
-                  // fieldDescription="Choose a unique username for your account."
+                  error={errors.mobile}
+                  {...register("mobile", registerValidationRules.mobile)}
+                  aria-invalid={errors.mobile ? true : false}
                 />
                 <CustomField
                   fieldLabel="Email"
@@ -54,7 +73,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="email"
                   inputType="email"
                   inputPlaceHolder="m@example.com"
-                  // fieldDescription="Choose a unique username for your account."
+                  error={errors.email}
+                  {...register("email", registerValidationRules.email)}
+                  aria-invalid={errors.email ? true : false}
                 />
               </FieldGroup>
               <FieldGroup className="grid max-w-sm grid-cols-1 md:grid-cols-2 gap-2">
@@ -64,7 +85,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="password"
                   inputType="password"
                   inputPlaceHolder="••••••••"
-                  // fieldDescription=" Must be at least 8 characters long."
+                  error={errors.password}
+                  {...register("password", registerValidationRules.password)}
+                  aria-invalid={errors.password ? true : false}
                 />
                 <CustomField
                   fieldLabel="Confirm Password"
@@ -72,17 +95,24 @@ export function SignupForm({ className, ...props }) {
                   inputId="cpassword"
                   inputType="password"
                   inputPlaceHolder="••••••••"
-                  // fieldDescription=" Must be at least 8 characters long."
+                  error={errors.password}
+                  aria-invalid={errors.password ? true : false}
                 />
               </FieldGroup>
-              <Field>
-                <Button type="submit">Create Account</Button>
-              </Field>
+              <Button type="submit">Create Account</Button>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or
               </FieldSeparator>
               <FieldDescription className="text-center">
-                Already have an account? <a href="#">Sign in</a>
+                Already have an account?{" "}
+                <Button variant="link" aschild>
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) => (isActive ? "active" : "")}
+                  >
+                    Log In
+                  </NavLink>
+                </Button>
               </FieldDescription>
             </FieldGroup>
           </form>
