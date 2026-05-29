@@ -10,27 +10,23 @@ import { NavLink } from "react-router";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
 import { registerValidationRules } from "@/utils/form-validations";
-import axios from "axios";
+import { useLoginMutation } from "@/store/services/authApiSlice";
 
 export function LoginForm({ className, ...props }) {
+  const [login, { data, isLoading, error }] = useLoginMutation();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    console.log(data);
-
+  const onSubmit = async (formData) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/login",
-        data,
-      );
-
-      if (response) console.log(response.data.message);
+      console.log(formData);
+      await login(formData).unwrap();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -77,15 +73,17 @@ export function LoginForm({ className, ...props }) {
               </FieldSeparator>
               <FieldDescription className="text-center">
                 Don&apos;t have an account?
-                <Button variant="link" aschild>
+                <Button variant="link" disabled={isLoading} aschild>
                   <NavLink
                     to="/register"
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
-                    Register
+                    {isLoading ? "Registering..." : "Register"}
                   </NavLink>
                 </Button>
               </FieldDescription>
+              {error && <p>error in fetching</p>}
+              {data && <p>response received : {data.message}</p>}
             </FieldGroup>
           </form>
           <div className="relative hidden bg-muted md:block">
