@@ -2,12 +2,9 @@ const User = require("../Models/User");
 const { comparePassword, hashPassword } = require("../utils/hasingPassword");
 
 const login = async (req, res) => {
-    console.log(req.body)
 
     const { username, password } = req.body;
-
     const user = await User.scope('withPassword').findOne({ where: { username: username } });
-
     const isMatched = await comparePassword(password, user.password)
 
     if (isMatched)
@@ -18,7 +15,6 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
 
-    console.log(req.body)
     try {
         const { name, username, mobile, email, password } = req.body;
 

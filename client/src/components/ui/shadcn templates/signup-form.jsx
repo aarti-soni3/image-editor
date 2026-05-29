@@ -8,23 +8,27 @@ import {
 } from "@/components/ui/shadcn templates/field";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
-import { registerValidationRules } from "@/utils/form-validations";
 import { NavLink } from "react-router";
 import { useRegisterMutation } from "@/store/services/authApiSlice";
+import { getRegisterValidationRules } from "@/utils/form-validations";
 
 export function SignupForm({ className, ...props }) {
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
   const [registerUser, { data, error, isLoading }] = useRegisterMutation();
 
+  const rules = getRegisterValidationRules(watch);
+
   const onSubmit = async (formData) => {
     try {
       console.log(formData);
-      await registerUser(formData).unwrap();
+      const { name, username, email, mobile, password } = formData;
+      await registerUser({ name, username, email, mobile, password }).unwrap();
     } catch (error) {
       console.log(error);
     }
@@ -50,7 +54,7 @@ export function SignupForm({ className, ...props }) {
                   inputType="text"
                   inputPlaceHolder="Max Leiter"
                   error={errors.name}
-                  {...register("name", registerValidationRules.name)}
+                  {...register("name", rules.name)}
                   aria-invalid={errors.name ? true : false}
                 />
                 <CustomField
@@ -60,7 +64,7 @@ export function SignupForm({ className, ...props }) {
                   inputType="text"
                   inputPlaceHolder="max-leiter"
                   error={errors.username}
-                  {...register("username", registerValidationRules.username)}
+                  {...register("username", rules.username)}
                   aria-invalid={errors.username ? true : false}
                 />
               </FieldGroup>
@@ -72,7 +76,7 @@ export function SignupForm({ className, ...props }) {
                   inputType="tel"
                   inputPlaceHolder="9966331188"
                   error={errors.mobile}
-                  {...register("mobile", registerValidationRules.mobile)}
+                  {...register("mobile", rules.mobile)}
                   aria-invalid={errors.mobile ? true : false}
                 />
                 <CustomField
@@ -82,7 +86,7 @@ export function SignupForm({ className, ...props }) {
                   inputType="email"
                   inputPlaceHolder="m@example.com"
                   error={errors.email}
-                  {...register("email", registerValidationRules.email)}
+                  {...register("email", rules.email)}
                   aria-invalid={errors.email ? true : false}
                 />
               </FieldGroup>
@@ -94,7 +98,7 @@ export function SignupForm({ className, ...props }) {
                   inputType="password"
                   inputPlaceHolder="••••••••"
                   error={errors.password}
-                  {...register("password", registerValidationRules.password)}
+                  {...register("password", rules.password)}
                   aria-invalid={errors.password ? true : false}
                 />
                 <CustomField
@@ -103,8 +107,9 @@ export function SignupForm({ className, ...props }) {
                   inputId="cpassword"
                   inputType="password"
                   inputPlaceHolder="••••••••"
-                  error={errors.password}
-                  aria-invalid={errors.password ? true : false}
+                  error={errors.cpassword}
+                  {...register("cpassword", rules.cpassword)}
+                  aria-invalid={errors.cpassword ? true : false}
                 />
               </FieldGroup>
               <Button type="submit" disabled={isLoading ? true : false}>

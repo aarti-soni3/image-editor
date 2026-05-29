@@ -1,4 +1,4 @@
-export const registerValidationRules = {
+export const getRegisterValidationRules = (watch) => ({
     name: {
         required: "Name is required!",
         minLength: {
@@ -49,5 +49,19 @@ export const registerValidationRules = {
             value: 30,
             message: 'Must be less than 30 characters'
         },
+    },
+    cpassword: {
+        required: "Confirm Password is required!",
+        pattern: {
+            value: /^.{8,}$/,
+            message: 'Password must be 8 character long!'
+        },
+        maxLength: {
+            value: 30,
+            message: 'Must be less than 30 characters'
+        },
+        validate: (value) => {
+            return value === watch('password') || `Password & confirm password must be equal!`
+        }
     }
-}
+})

@@ -9,9 +9,8 @@ import {
 import { NavLink } from "react-router";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
-import { registerValidationRules } from "@/utils/form-validations";
+import { getRegisterValidationRules } from "@/utils/form-validations";
 import { useLoginMutation } from "@/store/services/authApiSlice";
-
 export function LoginForm({ className, ...props }) {
   const [login, { data, isLoading, error }] = useLoginMutation();
 
@@ -31,8 +30,8 @@ export function LoginForm({ className, ...props }) {
   };
 
   const loginValidationRule = {
-    username: registerValidationRules.username,
-    password: registerValidationRules.password,
+    username: getRegisterValidationRules(null).username,
+    password: getRegisterValidationRules(null).password,
   };
 
   return (
