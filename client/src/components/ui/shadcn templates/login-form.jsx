@@ -31,7 +31,7 @@ export function LoginForm({ className, ...props }) {
   };
 
   const loginValidationRule = {
-    email: registerValidationRules.email,
+    username: registerValidationRules.username,
     password: registerValidationRules.password,
   };
 
@@ -48,14 +48,14 @@ export function LoginForm({ className, ...props }) {
                 </p>
               </div>
               <CustomField
-                fieldLabel="Email"
-                htmlFor="email"
-                inputId="email"
-                inputType="email"
-                inputPlaceHolder="m@example.com"
-                error={errors.email}
-                {...register("email", loginValidationRule.email)}
-                aria-invalid={errors.email ? true : false}
+                fieldLabel="Username"
+                htmlFor="username"
+                inputId="username"
+                inputType="text"
+                inputPlaceHolder="max-leiter"
+                error={errors.username}
+                {...register("username", loginValidationRule.username)}
+                aria-invalid={errors.username ? true : false}
               />
               <CustomField
                 fieldLabel="Password"
@@ -82,7 +82,7 @@ export function LoginForm({ className, ...props }) {
                   </NavLink>
                 </Button>
               </FieldDescription>
-              {error && <p>error in fetching</p>}
+              {error && <p>error in fetching: {error.data.message}</p>}
               {data && <p>response received : {data.message}</p>}
             </FieldGroup>
           </form>

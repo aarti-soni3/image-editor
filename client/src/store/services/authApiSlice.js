@@ -15,8 +15,12 @@ export const authApi = apiSlice.injectEndpoints({
         login: builder.mutation({
             query: (data) => ({ url: '/auth/login', method: 'POST', body: data })
             // invalidatesTags: ['Auth']
+        }),
+        register: builder.mutation({
+            query: (data) => ({ url: '/auth/register', method: 'POST', body: data })
+            // invalidatesTags: ['Auth']
         })
     })
 })
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation } = authApi;

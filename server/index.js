@@ -3,12 +3,15 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 const cors = require('cors')
-const AuthRouter = require('./Routes/AuthRouter')
+const AuthRouter = require('./Routes/AuthRouter');
+const { connectToDatabase } = require('./Config/db');
 const port = process.env.PORT;
 
 const corsOption = {
     origin: 'http://localhost:5173'
 }
+
+connectToDatabase();
 
 app.use(cors(corsOption))
 app.use(express.json())

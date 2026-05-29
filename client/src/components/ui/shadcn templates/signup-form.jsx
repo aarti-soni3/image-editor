@@ -10,6 +10,7 @@ import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
 import { registerValidationRules } from "@/utils/form-validations";
 import { NavLink } from "react-router";
+import { useRegisterMutation } from "@/store/services/authApiSlice";
 
 export function SignupForm({ className, ...props }) {
   const {
@@ -18,8 +19,15 @@ export function SignupForm({ className, ...props }) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [registerUser, { data, error, isLoading }] = useRegisterMutation();
+
+  const onSubmit = async (formData) => {
+    try {
+      console.log(formData);
+      await registerUser(formData).unwrap();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -99,7 +107,9 @@ export function SignupForm({ className, ...props }) {
                   aria-invalid={errors.password ? true : false}
                 />
               </FieldGroup>
-              <Button type="submit">Create Account</Button>
+              <Button type="submit" disabled={isLoading ? true : false}>
+                Create Account
+              </Button>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or
               </FieldSeparator>
@@ -114,6 +124,8 @@ export function SignupForm({ className, ...props }) {
                   </NavLink>
                 </Button>
               </FieldDescription>
+              {error && <p>error in fetching: {error.data.message}</p>}
+              {data && <p>response received : {data.message}</p>}
             </FieldGroup>
           </form>
           <div className="relative hidden bg-muted md:block">

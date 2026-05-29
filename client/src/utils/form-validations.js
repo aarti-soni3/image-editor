@@ -5,12 +5,20 @@ export const registerValidationRules = {
             value: 3,
             message: 'Must be at least 3 characters'
         },
+        maxLength: {
+            value: 20,
+            message: 'Must be less than 20 characters'
+        },
     },
     username: {
         required: "Username is required!",
         minLength: {
             value: 3,
             message: 'Must be at least 3 characters'
+        },
+        maxLength: {
+            value: 20,
+            message: 'Must be less than 20 characters'
         },
     },
     mobile: {
@@ -36,6 +44,10 @@ export const registerValidationRules = {
         pattern: {
             value: /^.{8,}$/,
             message: 'Password must be 8 character long!'
-        }
+        },
+        maxLength: {
+            value: 30,
+            message: 'Must be less than 30 characters'
+        },
     }
 }

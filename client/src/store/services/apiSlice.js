@@ -1,3 +1,4 @@
+// must use /query/react instead of /query only if want to use hooks for mutation & queries
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const apiSlice = createApi({
