@@ -12,15 +12,19 @@ import { apiSlice } from "./apiSlice";
 
 export const authApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
+        access: builder.query({
+            query: () => ({ url: '/auth/access', method: 'GET' }),
+            providesTags: ['Auth']
+        }),
         login: builder.mutation({
-            query: (data) => ({ url: '/auth/login', method: 'POST', body: data })
-            // invalidatesTags: ['Auth']
+            query: (data) => ({ url: '/auth/login', method: 'POST', body: data }),
+            invalidatesTags: ['Auth']
         }),
         register: builder.mutation({
-            query: (data) => ({ url: '/auth/register', method: 'POST', body: data })
-            // invalidatesTags: ['Auth']
+            query: (token) => ({ url: '/auth/register', method: 'POST', body: token }),
+            invalidatesTags: ['Auth']
         })
     })
 })
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useAccessQuery } = authApi;

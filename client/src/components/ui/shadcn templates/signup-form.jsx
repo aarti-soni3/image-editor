@@ -11,8 +11,13 @@ import { useForm } from "react-hook-form";
 import { NavLink } from "react-router";
 import { useRegisterMutation } from "@/store/services/authApiSlice";
 import { getRegisterValidationRules } from "@/utils/form-validations";
+import { useContext } from "react";
+import { ToastContext } from "@/context/createContext";
+import { setLocalStorageData } from "@/utils/localStorageUtility";
 
 export function SignupForm({ className, ...props }) {
+  const { showErrorToast, showSuccessToast } = useContext(ToastContext);
+
   const {
     register,
     watch,
@@ -20,7 +25,7 @@ export function SignupForm({ className, ...props }) {
     formState: { errors },
   } = useForm();
 
-  const [registerUser, { data, error, isLoading }] = useRegisterMutation();
+  const [registerUser, { isLoading }] = useRegisterMutation();
 
   const rules = getRegisterValidationRules(watch);
 
@@ -28,9 +33,28 @@ export function SignupForm({ className, ...props }) {
     try {
       console.log(formData);
       const { name, username, email, mobile, password } = formData;
-      await registerUser({ name, username, email, mobile, password }).unwrap();
+      const response = await registerUser({
+        name,
+        username,
+        email,
+        mobile,
+        password,
+      }).unwrap();
+
+      console.log(response);
+
+      setLocalStorageData(
+        import.meta.env.VITE_ACCESSTOKEN_STORAGEKEY,
+        response.data.accessToken,
+      );
+      setLocalStorageData(
+        import.meta.env.VITE_REFRESHTOKEN_STORAGEKEY,
+        response.data.refreshToken,
+      );
+      showSuccessToast(response.data.message);
     } catch (error) {
       console.log(error);
+      showErrorToast(error?.data?.message || error?.message);
     }
   };
 
@@ -129,8 +153,6 @@ export function SignupForm({ className, ...props }) {
                   </NavLink>
                 </Button>
               </FieldDescription>
-              {error && <p>error in fetching: {error.data.message}</p>}
-              {data && <p>response received : {data.message}</p>}
             </FieldGroup>
           </form>
           <div className="relative hidden bg-muted md:block">
