@@ -65,3 +65,15 @@ export const getRegisterValidationRules = (watch) => ({
         }
     }
 })
+
+export const fileValidation = {
+    image: {
+        required: 'Image is required',
+        lessThan2MB: (files) => {
+            files?.[0]?.size < 2000000 || 'File must be less than 2MB'
+        },
+        acceptedFormats: (files) => {
+            ['image/jpeg', 'image/jpg', 'image/png'].includes(files?.[0]?.type) || 'Only JPEG, JPG, PNG files are allowed!'
+        }
+    }
+}

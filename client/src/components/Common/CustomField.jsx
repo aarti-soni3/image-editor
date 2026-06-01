@@ -14,7 +14,7 @@ const CustomField = forwardRef(
       inputId,
       inputType,
       inputPlaceHolder,
-      // fieldDescription,
+      fieldDescription,
       error,
       ...rest
     },
@@ -31,6 +31,9 @@ const CustomField = forwardRef(
           {...rest}
           // required
         />
+        {fieldDescription && (
+          <FieldDescription>{fieldDescription}</FieldDescription>
+        )}
         {error && (
           <FieldDescription className="text-red-600">
             {error.message}
