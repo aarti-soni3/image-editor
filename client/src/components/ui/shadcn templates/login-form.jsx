@@ -6,13 +6,21 @@ import {
   FieldGroup,
   FieldSeparator,
 } from "@/components/ui/shadcn templates/field";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
 import { getRegisterValidationRules } from "@/utils/form-validations";
 import { useLoginMutation } from "@/store/services/authApiSlice";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/store/slice/authSlice";
+import { setLocalStorageData } from "@/utils/localStorageUtility";
+import { useContext } from "react";
+import { ToastContext } from "@/context/createContext";
 export function LoginForm({ className, ...props }) {
-  const [login, { data, isLoading, error }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [login, { isLoading }] = useLoginMutation();
+  const { showErrorToast, showSuccessToast } = useContext(ToastContext);
 
   const {
     register,
@@ -22,10 +30,26 @@ export function LoginForm({ className, ...props }) {
 
   const onSubmit = async (formData) => {
     try {
-      console.log(formData);
-      await login(formData).unwrap();
+      console.log('formdata :',formData);
+      const response = await login(formData).unwrap();
+
+      if (response.data) {
+        dispatch(setCredentials(response.data));
+
+        setLocalStorageData(
+          import.meta.env.VITE_ACCESSTOKEN_STORAGEKEY,
+          response?.data?.accessToken,
+        );
+        setLocalStorageData(
+          import.meta.env.VITE_REFRESHTOKEN_STORAGEKEY,
+          response?.data?.refreshToken,
+        );
+
+        showSuccessToast(response.data?.message);
+        navigate("/");
+      }
     } catch (error) {
-      console.error(error);
+      showErrorToast(error?.data?.message || error?.message);
     }
   };
 
@@ -66,7 +90,9 @@ export function LoginForm({ className, ...props }) {
                 {...register("password", loginValidationRule.password)}
                 aria-invalid={errors.password ? true : false}
               />
-              <Button type="submit">Login</Button>
+              <Button type="submit">
+                {isLoading ? "Logging..." : "Log in"}
+              </Button>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or
               </FieldSeparator>
@@ -77,12 +103,10 @@ export function LoginForm({ className, ...props }) {
                     to="/register"
                     className={({ isActive }) => (isActive ? "active" : "")}
                   >
-                    {isLoading ? "Registering..." : "Register"}
+                    Register
                   </NavLink>
                 </Button>
               </FieldDescription>
-              {error && <p>error in fetching: {error.data.message}</p>}
-              {data && <p>response received : {data.message}</p>}
             </FieldGroup>
           </form>
           <div className="relative hidden bg-muted md:block">

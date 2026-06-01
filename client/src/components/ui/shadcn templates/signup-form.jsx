@@ -8,14 +8,18 @@ import {
 } from "@/components/ui/shadcn templates/field";
 import CustomField from "../../Common/CustomField";
 import { useForm } from "react-hook-form";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { useRegisterMutation } from "@/store/services/authApiSlice";
 import { getRegisterValidationRules } from "@/utils/form-validations";
 import { useContext } from "react";
 import { ToastContext } from "@/context/createContext";
 import { setLocalStorageData } from "@/utils/localStorageUtility";
+import { setCredentials } from "@/store/slice/authSlice";
+import { useDispatch } from "react-redux";
 
 export function SignupForm({ className, ...props }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { showErrorToast, showSuccessToast } = useContext(ToastContext);
 
   const {
@@ -31,7 +35,7 @@ export function SignupForm({ className, ...props }) {
 
   const onSubmit = async (formData) => {
     try {
-      console.log(formData);
+      console.log('formData: ',formData);
       const { name, username, email, mobile, password } = formData;
       const response = await registerUser({
         name,
@@ -41,7 +45,7 @@ export function SignupForm({ className, ...props }) {
         password,
       }).unwrap();
 
-      console.log(response);
+      dispatch(setCredentials(response.data));
 
       setLocalStorageData(
         import.meta.env.VITE_ACCESSTOKEN_STORAGEKEY,
@@ -52,8 +56,8 @@ export function SignupForm({ className, ...props }) {
         response.data.refreshToken,
       );
       showSuccessToast(response.data.message);
+      navigate("/");
     } catch (error) {
-      console.log(error);
       showErrorToast(error?.data?.message || error?.message);
     }
   };

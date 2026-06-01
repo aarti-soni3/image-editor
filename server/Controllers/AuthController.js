@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const { comparePassword, hashPassword } = require("../utils/hasingPassword");
 const { generateAccessToken, generateRefreshToken, verifyToken } = require("../utils/jsonwebtoken-utility");
@@ -8,10 +9,13 @@ const login = async (req, res) => {
     const user = await User.scope('withPassword').findOne({ where: { username: username } });
     const isMatched = await comparePassword(password, user.password)
 
+    const accessToken = generateAccessToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
+    const refreshToken = generateRefreshToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
+
     if (isMatched)
-        res.status(200).json({ data: { message: 'login req received!' } });
+        res.status(200).json({ data: { user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Loggedin Successfully!' } });
     else
-        res.status(400).json({ data: { message: 'invalid data' } });
+        res.status(400).json({ data: { message: 'Invalid username or password!' } });
 }
 
 const register = async (req, res) => {
@@ -44,21 +48,46 @@ const register = async (req, res) => {
 }
 
 const access = async (req, res) => {
-    const accessToken = req.headers.authorization;
-
-    const token = accessToken && accessToken.split(' ')[1];
-    console.log('token :', token)
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token)
-        return res.status(400).json({ data: { message: 'Access denied...No token available!' } })
+        return res.status(400).json({ data: { message: 'Access denied...No token available!' } });
 
-    const decodeUser = verifyToken(token)
+    jwt.verify(token, process.env.ACCESSTOKEN_KEY, (error, decoded) => {
+        if (error) {
+            if (error.name === 'TokenExpiredError')
+                return res.status(401).json({ data: { message: 'Token expired!' } });
 
-    if (!decodeUser)
-        return res.status(403).json({ data: { message: 'Invalid or expired token!' } })
-
-    console.log(decodeUser)
-    return res.status(200).json({ data: { user: decodeUser, message: 'success' } })
+            return res.status(403).json({ data: { message: 'Invalid token!' } });
+        }
+        return res.status(200).json({ data: { user: decoded?.data, message: 'success' } });
+    });
 }
 
-module.exports = { login, register, access }
+const refresh = async (req, res) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken)
+            return res.status(400).json({ data: { message: 'Access denied...No token available!' } });
+
+        const decodedUser = verifyToken(refreshToken, process.env.REFRESHTOKEN_KEY);
+
+        if (!decodedUser)
+            return res.status(403).json({ data: { message: 'Invalid or expired token!' } });
+
+        const user = decodedUser.data;
+        const accessToken = generateAccessToken(user);
+        const newRefreshToken = generateRefreshToken(user);
+
+        return res.status(200).json({ data: { user, accessToken, refreshToken: newRefreshToken, message: 'Token refreshed successfully!' } });
+    } catch (error) {
+        if (error.name === 'TokenExpiredError')
+            return res.status(403).json({ data: { message: 'Invalid or expired token!' } });
+
+        return res.status(500).json({ data: { message: 'Something went wrong!' } });
+    }
+}
+
+module.exports = { login, register, access, refresh }

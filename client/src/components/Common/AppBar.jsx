@@ -1,10 +1,19 @@
+import { useNavigate } from "react-router";
 import { Blend } from "lucide-react";
 import { Button } from "../ui/shadcn templates/button";
 import { NavLink } from "react-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/store/slice/authSlice";
 
 export default function AppBar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="fixed w-full m-auto p-4 flex flex-row justify-between shadow-xs">
@@ -31,22 +40,6 @@ export default function AppBar() {
               Home
             </NavLink>
           </Button>
-          <Button variant="link" aschild className="font-bold text-lg">
-            <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Home
-            </NavLink>
-          </Button>
-          <Button variant="link" aschild className="font-bold text-lg">
-            <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Home
-            </NavLink>
-          </Button>
         </nav>
       </div>
       <div className="flex flex-row">
@@ -60,7 +53,7 @@ export default function AppBar() {
                 Login
               </NavLink>
             </Button>
-            <Button variant="link" className="font-semibold text-md">
+            <Button variant="link" className="font-semibold text-md" aschild>
               <NavLink
                 to="/register"
                 className={({ isActive }) => (isActive ? "active" : "")}
@@ -70,13 +63,12 @@ export default function AppBar() {
             </Button>
           </>
         ) : (
-          <Button variant="link" className="font-semibold text-md">
-            <NavLink
-              to="/"
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Logout
-            </NavLink>
+          <Button
+            variant="link"
+            className="font-semibold text-md"
+            onClick={handleLogout}
+          >
+            Logout
           </Button>
         )}
       </div>

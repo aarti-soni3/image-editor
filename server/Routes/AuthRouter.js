@@ -18,6 +18,8 @@ router.route('/login').post(validate([
     body('password').isLength({ min: 8 }).withMessage("Password must be 8 character long!")
 ]), catchAsync(authController.login));
 
-router.route('/access').get(validate([body("accessToken").isEmpty().withMessage('AccessToken is missing!')]), catchAsync(authController.access));
+router.route('/access').get(catchAsync(authController.access));
+
+router.route('/refresh').post(catchAsync(authController.refresh));
 
 module.exports = router
