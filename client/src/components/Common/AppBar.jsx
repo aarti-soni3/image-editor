@@ -16,7 +16,7 @@ export default function AppBar() {
   };
 
   return (
-    <header className="fixed w-full m-auto p-4 flex flex-row justify-between shadow-xs">
+    <header className="fixed t-0 z-50 w-full m-auto p-4 flex flex-row justify-between bg-muted shadow-sm">
       <NavLink
         to="/"
         className={({ isActive }) =>

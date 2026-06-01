@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { Routes, Route, useLocation } from "react-router";
 import "./App.css";
 import Login from "./components/ui/User/Login";
 import { Register } from "./components/ui/User/Register";
@@ -10,26 +10,29 @@ import ProtectedRoute from "./components/Common/ProtectedRoute";
 import GuestRoute from "./components/Common/GuestRoute";
 
 function App() {
-  useAccessQuery();
+  const location = useLocation();
+
+  const shouldSkip =
+    location.pathname === "/register" || location.pathname === "/login";
+
+  useAccessQuery(undefined, { skip: shouldSkip });
 
   return (
-    <section className="w-screen h-screen flex flex-col items-center">
+    <section className="w-screen h-screen flex flex-col items-center bg-muted">
       <div className="w-full">
         <ToastProvider>
-          <BrowserRouter>
-            {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
-            <AppBar />
-            {/* <div className="w-full m-25" /> */}
-            <Routes>
-              <Route element={<ProtectedRoute />}>
-                <Route index path="/" element={<Home />} />
-              </Route>
-              <Route element={<GuestRoute />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
+          {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
+          <AppBar />
+          <div className="py-10" />
+          <Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route index path="/" element={<Home />} />
+            </Route>
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+          </Routes>
         </ToastProvider>
       </div>
     </section>
