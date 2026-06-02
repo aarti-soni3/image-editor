@@ -18,12 +18,12 @@ function App() {
   useAccessQuery(undefined, { skip: shouldSkip });
 
   return (
-    <section className="w-screen h-screen flex flex-col items-center bg-muted">
-      <div className="w-full">
-        <ToastProvider>
-          {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
-          <AppBar />
-          <div className="py-10" />
+    <section className="w-full h-full flex flex-col items-center bg-muted">
+      <ToastProvider>
+        {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
+        <AppBar />
+        <div className="w-full py-9" />
+        <div className="w-full h-full flex flex-col justify-center">
           <Routes>
             <Route element={<ProtectedRoute />}>
               <Route index path="/" element={<Home />} />
@@ -33,8 +33,8 @@ function App() {
               <Route path="/register" element={<Register />} />
             </Route>
           </Routes>
-        </ToastProvider>
-      </div>
+        </div>
+      </ToastProvider>
     </section>
   );
 }

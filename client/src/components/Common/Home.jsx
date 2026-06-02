@@ -5,7 +5,7 @@ export default function Home() {
   const { user } = useSelector((state) => state.auth);
   console.log(user);
   return (
-    <section className="w-full p-8">
+    <section className="w-full px-10 py-5">
       <div className="w-full p-6">
         <ImageEdit />
       </div>

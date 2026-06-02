@@ -14,7 +14,7 @@ export const ImageEdit = () => {
     register,
     watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({ mode: "onChange" });
 
   const [imageSrc, setImageSrc] = useState(defaultImage);
 
@@ -75,34 +75,39 @@ export const ImageEdit = () => {
         error={errors.image}
         {...register("image", fileValidation.image)}
         aria-invalid={errors.image ? true : false}
+        accept="image/*"
       />
 
-      <ImageCropper srcImage={imageSrc} aspectRatio={currentAspectRatio} />
+      <div className="flex flex-row justify-between gap-6">
+        <div className="flex flex-col justify-center gap-4">
+          <ImageCropper srcImage={imageSrc} aspectRatio={currentAspectRatio} />
+          <div className="w-full flex flex-row gap-5 justify-center">
+            <h6 className="font-bold">Aspect Ratio :</h6>
 
-      <div className="w-full flex flex-row gap-5 justify-center">
-        <h6 className="font-bold">Aspect Ratio :</h6>
-        
-        //use value here not default value in radio group for specifing default
-        value
-        <RadioGroup
-          value={aspectRatioKey}
-          className="w-fit flex flex-row gap-3"
-          onValueChange={(key) => setAspectRatioKey(key)}
-        >
-          {Object.keys(aspectRatioSize).map((key) => {
-            const item = aspectRatioSize[key];
-            return (
-              <div key={key} className="flex items-center gap-3">
-                <RadioGroupItem
-                  value={key}
-                  id={key}
-                  className="border border-emerald-700"
-                />
-                <Label htmlFor={key}>{item.name}</Label>
-              </div>
-            );
-          })}
-        </RadioGroup>
+            {/* use value here not default value in radio group for specifing default value */}
+            <RadioGroup
+              value={aspectRatioKey}
+              className="w-fit flex flex-row gap-3"
+              onValueChange={(key) => setAspectRatioKey(key)}
+            >
+              {Object.keys(aspectRatioSize).map((key) => {
+                const item = aspectRatioSize[key];
+                return (
+                  <div key={key} className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={key}
+                      id={key}
+                      className="border border-emerald-700"
+                    />
+                    <Label htmlFor={key}>{item.name}</Label>
+                  </div>
+                );
+              })}
+            </RadioGroup>
+          </div>
+
+          
+        </div>
       </div>
     </section>
   );

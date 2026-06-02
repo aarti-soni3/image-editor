@@ -66,6 +66,35 @@ export const getRegisterValidationRules = (watch) => ({
     }
 })
 
+export const validateImageResolution = (file) => {
+
+    const minHeight = 400;
+    const minWidth = 400;
+    const maxHeight = 768;
+    const maxWidth = 1024;
+
+    return new Promise((resolve) => {
+        if (!file || !(file instanceof File)) {
+            resolve(true)
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+
+            img.onload = () => {
+                if (img.width < minWidth || img.height < minHeight || img.width > maxWidth || img.height > maxHeight)
+                    resolve(`Image must be at least ${minWidth} * ${minHeight} & not exceeding ${maxWidth} * ${maxHeight}`);
+                else
+                    resolve(true)
+            }
+            img.onerror = () => resolve('Invalid image file...!')
+        }
+    })
+}
 export const fileValidation = {
     image: {
         required: 'Image is required',
@@ -73,7 +102,11 @@ export const fileValidation = {
             files?.[0]?.size < 2000000 || 'File must be less than 2MB'
         },
         acceptedFormats: (files) => {
-            ['image/jpeg', 'image/jpg', 'image/png'].includes(files?.[0]?.type) || 'Only JPEG, JPG, PNG files are allowed!'
+            ['image/jpeg', 'image/jpg'].includes(files?.[0]?.type) || 'Only JPEG, JPG, PNG files are allowed!'
+        },
+        validate: async (files) => {
+            const file = files?.[0];
+            return await validateImageResolution(file);
         }
     }
 }
