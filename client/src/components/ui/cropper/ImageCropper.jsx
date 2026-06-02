@@ -21,7 +21,6 @@ export default function ImageCropper() {
     : 16 / 9;
 
   const [croppedImage, setCroppedImage] = useState(null);
-  console.log("is upload error :", isUploadError);
 
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
@@ -68,26 +67,39 @@ export default function ImageCropper() {
   return (
     <>
       <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
-        {croppedImage && (
-          <div className="flex flex-col gap-2 min-w-50 max-w-100">
-            <h4>Cropped Image Preview</h4>
-            <img src={croppedImage} className="w-100" />
-          </div>
-        )}
+        <div className="flex flex-col gap-2 min-w-50 max-w-100">
+          {croppedImage && (
+            <>
+              <h4>Cropped Image Preview</h4>
+              <img src={croppedImage} className="w-100" />
+            </>
+          )}
+        </div>
         <div className="flex flex-col gap-2">
           <h4>Edit Image Preview</h4>
           <Cropper
             ref={cropperRef}
-            src={srcImage}
             style={containerStyle}
-            initialAspectRatio={initialRatio}
-            guides={false}
+            src={srcImage}
+            viewMode={1}
+            aspectRatio={initialRatio}
+            // initialAspectRatio={0}
+            // zoomTo={0.5}
+            // minCropBoxHeight={10}
+            // minCropBoxWidth={10}
+            // background={false}
+            // responsive={true}
+            // autoCropArea={1}
+            // checkOrientation={false}
+            guides={true}
             crop={onCrop}
           />
           <ImageRatio />
           <Button onClick={handleDownload}>Save</Button>
           {isUploadError && (
-            <div className="text-red-700"> Can't save image please upload another image! </div>
+            <div className="text-red-700">
+              Can't save image please upload another image!{" "}
+            </div>
           )}
         </div>
       </div>

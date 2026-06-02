@@ -19,13 +19,13 @@ function App() {
   useAccessQuery(undefined, { skip: shouldSkip });
 
   return (
-    <section className="w-full h-full flex flex-col items-center bg-muted">
+    <section className="min-h-dvh flex flex-col items-center bg-muted">
       <ToastProvider>
         <CropperProvider>
           {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
           <AppBar />
           <div className="w-full py-9" />
-          <div className="w-full h-full flex flex-col justify-center px-10 md:px-25">
+          <div className="w-full flex flex-col flex-1 justify-center px-10 md:px-25">
             <Routes>
               <Route element={<ProtectedRoute />}>
                 <Route index path="/" element={<Home />} />

@@ -6,6 +6,13 @@ export const CropperProvider = ({ children }) => {
     "https://raw.githubusercontent.com/roadmanfong/react-cropper/master/example/img/child.jpg";
 
   const aspectRatioSize = {
+    free: {
+      name: "Free",
+      size: {
+        x: NaN,
+        y: NaN,
+      },
+    },
     widescreen: {
       name: "16:9",
       size: {

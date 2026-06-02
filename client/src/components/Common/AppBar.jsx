@@ -20,9 +20,7 @@ export default function AppBar() {
       <NavLink
         to="/"
         className={({ isActive }) =>
-          isActive
-            ? "active flex items-center gap-2 font-medium"
-            : "flex items-center gap-2 font-medium"
+          `flex items-center gap-2 font-bold ${isActive ? "active" : ""}`
         }
       >
         <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -30,7 +28,7 @@ export default function AppBar() {
         </div>
         PicBlend
       </NavLink>
-      <div>
+      {/* <div>
         <nav>
           <Button variant="link" aschild className="font-bold text-lg">
             <NavLink
@@ -41,7 +39,7 @@ export default function AppBar() {
             </NavLink>
           </Button>
         </nav>
-      </div>
+      </div> */}
       <div className="flex flex-row">
         {!user ? (
           <>
