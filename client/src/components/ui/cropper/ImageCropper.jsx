@@ -83,6 +83,8 @@ export default function ImageCropper() {
             src={srcImage}
             viewMode={1}
             aspectRatio={initialRatio}
+            guides={true}
+            crop={onCrop}
             // initialAspectRatio={0}
             // zoomTo={0.5}
             // minCropBoxHeight={10}
@@ -91,8 +93,6 @@ export default function ImageCropper() {
             // responsive={true}
             // autoCropArea={1}
             // checkOrientation={false}
-            guides={true}
-            crop={onCrop}
           />
           <ImageRatio />
           <Button onClick={handleDownload}>Save</Button>
