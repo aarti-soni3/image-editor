@@ -5,6 +5,7 @@ import { Button } from "../shadcn templates/button";
 import { ImageRatio } from "./ImageRatio";
 import { useContext } from "react";
 import { CropperContext } from "@/context/createContext";
+import { ColorEdit } from "../camanjs/ColorEdit";
 
 export default function ImageCropper() {
   const {
@@ -67,14 +68,6 @@ export default function ImageCropper() {
   return (
     <>
       <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
-        <div className="flex flex-col gap-2 min-w-50 max-w-100">
-          {croppedImage && (
-            <>
-              <h4>Cropped Image Preview</h4>
-              <img src={croppedImage} className="w-100" />
-            </>
-          )}
-        </div>
         <div className="flex flex-col gap-2">
           <h4>Edit Image Preview</h4>
           <Cropper
@@ -101,6 +94,16 @@ export default function ImageCropper() {
               Can't save image please upload another image!{" "}
             </div>
           )}
+        </div>
+        <div className="flex flex-col gap-2 min-w-50 max-w-100">
+          {croppedImage && (
+            <>
+              <h4>Cropped Image Preview</h4>
+              <img src={croppedImage} className="w-100" />
+            </>
+          )}
+
+          <ColorEdit />
         </div>
       </div>
     </>
