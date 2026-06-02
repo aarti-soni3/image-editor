@@ -3,16 +3,25 @@ import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { Button } from "../shadcn templates/button";
 import { ImageRatio } from "./ImageRatio";
+import { useContext } from "react";
+import { CropperContext } from "@/context/createContext";
 
-export default function ImageCropper({ srcImage, aspectRatio }) {
+export default function ImageCropper() {
+  const {
+    imageSrc: srcImage,
+    currentAspectRatio: aspectRatio,
+    isUploadError,
+  } = useContext(CropperContext);
+
   const cropperRef = useRef(null);
   const currentImage = useRef(srcImage);
-  const containerStyle = { height: "100%", width: "100%" };
+  const containerStyle = { height: "100%", width: "75%" };
   const initialRatio = aspectRatio?.size
     ? aspectRatio.size.x / aspectRatio.size.y
     : 16 / 9;
 
   const [croppedImage, setCroppedImage] = useState(null);
+  console.log("is upload error :", isUploadError);
 
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
@@ -32,34 +41,54 @@ export default function ImageCropper({ srcImage, aspectRatio }) {
 
   const onCrop = () => {
     const cropper = cropperRef.current?.cropper;
-    const getCroppedCanvas = cropper.getCroppedCanvas();
-    setCroppedImage(getCroppedCanvas.toDataURL());
+    const croppedCanvas = cropper.getCroppedCanvas();
+    setCroppedImage(croppedCanvas.toDataURL());
     // console.log("image croper data : ", cropper.getCroppedCanvas().toDataURL());
+  };
+
+  const handleDownload = () => {
+    if (isUploadError) return;
+
+    const cropper = cropperRef.current?.cropper;
+    const croppedCanvas = cropper.getCroppedCanvas();
+
+    if (croppedCanvas) {
+      const dataURL = croppedCanvas.toDataURL("image/png");
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = dataURL;
+      downloadLink.download = "cropped-img.png";
+
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    }
   };
 
   return (
     <>
-      <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-between gap-8">
+      <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
         {croppedImage && (
-          <div className="flex flex-col grow-0 gap-2">
+          <div className="flex flex-col gap-2 min-w-50 max-w-100">
             <h4>Cropped Image Preview</h4>
             <img src={croppedImage} className="w-100" />
           </div>
         )}
-        <div className="flex flex-col grow-1 gap-2">
+        <div className="flex flex-col gap-2">
           <h4>Edit Image Preview</h4>
-          <div className="w-auto">
-            <Cropper
-              ref={cropperRef}
-              src={srcImage}
-              style={containerStyle}
-              initialAspectRatio={initialRatio}
-              guides={false}
-              crop={onCrop}
-            />
-          </div>
+          <Cropper
+            ref={cropperRef}
+            src={srcImage}
+            style={containerStyle}
+            initialAspectRatio={initialRatio}
+            guides={false}
+            crop={onCrop}
+          />
           <ImageRatio />
-          <Button onClick={onCrop}>Crop</Button>
+          <Button onClick={handleDownload}>Save</Button>
+          {isUploadError && (
+            <div className="text-red-700"> Can't save image please upload another image! </div>
+          )}
         </div>
       </div>
     </>

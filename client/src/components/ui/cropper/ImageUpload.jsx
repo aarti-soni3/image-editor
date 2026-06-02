@@ -5,7 +5,7 @@ import { useContext, useEffect } from "react";
 import { CropperContext } from "@/context/createContext";
 
 export const ImageUpload = () => {
-  const { setImageSrc } = useContext(CropperContext);
+  const { setImageSrc, setIsUploadError } = useContext(CropperContext);
   const {
     register,
     watch,
@@ -14,6 +14,12 @@ export const ImageUpload = () => {
 
   const fileList = watch("image");
   const selectedFile = fileList && fileList.length > 0 ? fileList[0] : null;
+
+  useEffect(() => {
+    if (errors.image) {
+      setIsUploadError(errors.image);
+    } else setIsUploadError(false);
+  }, [setIsUploadError, errors.image]);
 
   useEffect(() => {
     if (selectedFile) {
