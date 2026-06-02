@@ -8,6 +8,7 @@ import Home from "./components/Common/Home";
 import { useAccessQuery } from "./store/services/authApiSlice";
 import ProtectedRoute from "./components/Common/ProtectedRoute";
 import GuestRoute from "./components/Common/GuestRoute";
+import { CropperProvider } from "./context/CropperProvider";
 
 function App() {
   const location = useLocation();
@@ -20,20 +21,22 @@ function App() {
   return (
     <section className="w-full h-full flex flex-col items-center bg-muted">
       <ToastProvider>
-        {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
-        <AppBar />
-        <div className="w-full py-9" />
-        <div className="w-full h-full flex flex-col justify-center">
-          <Routes>
-            <Route element={<ProtectedRoute />}>
-              <Route index path="/" element={<Home />} />
-            </Route>
-            <Route element={<GuestRoute />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Route>
-          </Routes>
-        </div>
+        <CropperProvider>
+          {/* must specify appbar compo. inside browserRouter if you want to use NavLink */}
+          <AppBar />
+          <div className="w-full py-9" />
+          <div className="w-full h-full flex flex-col justify-center px-10 md:px-25">
+            <Routes>
+              <Route element={<ProtectedRoute />}>
+                <Route index path="/" element={<Home />} />
+              </Route>
+              <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Route>
+            </Routes>
+          </div>
+        </CropperProvider>
       </ToastProvider>
     </section>
   );
