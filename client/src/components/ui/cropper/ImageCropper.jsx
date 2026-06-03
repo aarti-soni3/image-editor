@@ -4,9 +4,9 @@ import "cropperjs/dist/cropper.css";
 import { Button } from "../shadcn templates/button";
 import { ImageRatio } from "./ImageRatio";
 import { useContext } from "react";
-import { CropperContext } from "@/context/createContext";
+import { CropperContext, FilterContext } from "@/context/createContext";
 import { useCropMutation } from "@/store/services/imageApiSlice";
-// import { ColorEdit } from "../camanjs/ColorEdit";
+import { ColorEdit } from "../camanjs/ColorEdit";
 
 export default function ImageCropper() {
   const {
@@ -15,9 +15,13 @@ export default function ImageCropper() {
     isUploadError,
   } = useContext(CropperContext);
 
+  const { filterStyle } = useContext(FilterContext);
+  console.log(filterStyle);
+
   const [crop, { data, isLoading, error }] = useCropMutation();
 
   const cropperRef = useRef(null);
+  const croppedImageRef = useRef(null);
   const currentImage = useRef(srcImage);
   const containerStyle = { height: "100%", width: "75%" };
   const initialRatio = aspectRatio?.size
@@ -90,12 +94,13 @@ export default function ImageCropper() {
       formData.append("imageData", JSON.stringify(imageData));
 
       const res = await crop(formData);
-      // console.log("res data : ", res.data);
-      // console.log("mutation data : ", data);
+      console.log("res data : ", res.data);
+      console.log("mutation data : ", data);
     } catch (error) {
       console.log("errrrr : ", error.message);
     }
   };
+
   return (
     <>
       <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
@@ -135,11 +140,17 @@ export default function ImageCropper() {
           {croppedImage && (
             <>
               <h4>Cropped Image Preview</h4>
-              <img src={croppedImage} className="w-100" />
+              <img
+                ref={croppedImageRef}
+                id="cropped-image"
+                src={croppedImage}
+                className="w-100"
+                style={filterStyle}
+              />
             </>
           )}
 
-          {/* <ColorEdit /> */}
+          <ColorEdit croppedImageRef={croppedImageRef} />
         </div>
       </div>
     </>
