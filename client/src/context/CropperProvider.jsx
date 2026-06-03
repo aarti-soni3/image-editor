@@ -47,6 +47,7 @@ export const CropperProvider = ({ children }) => {
   const [aspectRatioKey, setAspectRatioKey] = useState("square");
   const [isUploadError, setIsUploadError] = useState(false);
   const currentAspectRatio = aspectRatioSize[aspectRatioKey];
+  const [imageData, setImageData] = useState(null);
 
   return (
     <CropperContext.Provider
@@ -59,6 +60,8 @@ export const CropperProvider = ({ children }) => {
         setAspectRatioKey,
         currentAspectRatio,
         aspectRatioSize,
+        imageData,
+        setImageData,
       }}
     >
       {children}

@@ -28,18 +28,15 @@ const baseQueryWithReAuth = async (args, api, options) => {
                     method: 'POST',
                     body: { refreshToken }
                 }, api, options);
-                
+
                 if (refreshResult?.data) {
-                    console.log('data received refresh')
                     const authData = refreshResult.data?.data ?? refreshResult.data;
                     api.dispatch(setCredentials(authData));
                     result = await baseQuery(args, api, options);
                 } else {
-                    console.log('data not received')
                     api.dispatch(logout());
                 }
             } catch (error) {
-                    console.log('token not avil')
                 console.log(error)
             }
         } else {
@@ -49,11 +46,9 @@ const baseQueryWithReAuth = async (args, api, options) => {
 
     return result;
 }
-
-
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReAuth,
-    tagTypes: ['Auth'],
+    tagTypes: ['Auth','Image'],
     endpoints: () => ({})
 })

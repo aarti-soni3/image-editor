@@ -6,8 +6,10 @@ import { CropperContext } from "@/context/createContext";
 
 export const ImageUpload = () => {
   const { setImageSrc, setIsUploadError } = useContext(CropperContext);
+
   const {
     register,
+    // handleSubmit,
     watch,
     formState: { errors },
   } = useForm({ mode: "onChange" });
@@ -30,17 +32,25 @@ export const ImageUpload = () => {
     }
   }, [selectedFile, setImageSrc]);
 
+  // const onSubmit = (data) => {
+  //   console.log(data);
+  // };
+
   return (
-    <CustomField
-      fieldLabel="Upload Image"
-      htmlFor="image"
-      inputId="image"
-      inputType="file"
-      fieldDescription="Select image to upload"
-      error={errors.image}
-      {...register("image", fileValidation.image)}
-      aria-invalid={errors.image ? true : false}
-      accept="image/*"
-    />
+    <>
+      {/* <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data"> */}
+      <CustomField
+        fieldLabel="Upload Image"
+        htmlFor="image"
+        inputId="image"
+        inputType="file"
+        fieldDescription="Select image to upload"
+        error={errors.image}
+        {...register("image", fileValidation.image)}
+        aria-invalid={errors.image ? true : false}
+        accept="image/*"
+      />
+      {/* </form> */}
+    </>
   );
 };

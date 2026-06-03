@@ -26,6 +26,7 @@ const CustomField = forwardRef(
         <Input
           id={inputId}
           type={inputType}
+          name={inputId}
           placeholder={inputPlaceHolder}
           ref={ref}
           {...rest}

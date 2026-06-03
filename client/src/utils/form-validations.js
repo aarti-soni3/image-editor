@@ -95,6 +95,7 @@ export const validateImageResolution = (file) => {
         }
     })
 }
+
 export const fileValidation = {
     image: {
         required: 'Image is required',

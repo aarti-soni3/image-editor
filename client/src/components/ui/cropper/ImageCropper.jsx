@@ -5,7 +5,8 @@ import { Button } from "../shadcn templates/button";
 import { ImageRatio } from "./ImageRatio";
 import { useContext } from "react";
 import { CropperContext } from "@/context/createContext";
-import { ColorEdit } from "../camanjs/ColorEdit";
+import { useCropMutation } from "@/store/services/imageApiSlice";
+// import { ColorEdit } from "../camanjs/ColorEdit";
 
 export default function ImageCropper() {
   const {
@@ -13,6 +14,8 @@ export default function ImageCropper() {
     currentAspectRatio: aspectRatio,
     isUploadError,
   } = useContext(CropperContext);
+
+  const [crop, { data, isLoading, error }] = useCropMutation();
 
   const cropperRef = useRef(null);
   const currentImage = useRef(srcImage);
@@ -46,25 +49,53 @@ export default function ImageCropper() {
     // console.log("image croper data : ", cropper.getCroppedCanvas().toDataURL());
   };
 
-  const handleDownload = () => {
-    if (isUploadError) return;
+  // const handleDownload = () => {
+  //   if (isUploadError) return;
 
+  //   const cropper = cropperRef.current?.cropper;
+  //   const croppedCanvas = cropper.getCroppedCanvas();
+
+  //   if (croppedCanvas) {
+  //     const dataURL = croppedCanvas.toDataURL("image/png");
+
+  //     const downloadLink = document.createElement("a");
+  //     downloadLink.href = dataURL;
+  //     downloadLink.download = "cropped-img.png";
+
+  //     document.body.appendChild(downloadLink);
+  //     downloadLink.click();
+  //     document.body.removeChild(downloadLink);
+  //   }
+  // };
+
+  const handleUpload = async () => {
     const cropper = cropperRef.current?.cropper;
-    const croppedCanvas = cropper.getCroppedCanvas();
+    if (!cropper) return;
 
-    if (croppedCanvas) {
-      const dataURL = croppedCanvas.toDataURL("image/png");
+    try {
+      const imageData = cropper.getData(true);
+      const formData = new FormData();
 
-      const downloadLink = document.createElement("a");
-      downloadLink.href = dataURL;
-      downloadLink.download = "cropped-img.png";
+      const fetchedImage = await fetch(srcImage);
+      const blob = await fetchedImage.blob();
 
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+      const file = new File([blob], "source-img.jpg", {
+        type: blob.type || "image/jpeg",
+      });
+
+      console.log("file : ", file);
+      console.log("imageData : ", imageData);
+
+      formData.append("image", file);
+      formData.append("imageData", JSON.stringify(imageData));
+
+      const res = await crop(formData);
+      // console.log("res data : ", res.data);
+      // console.log("mutation data : ", data);
+    } catch (error) {
+      console.log("errrrr : ", error.message);
     }
   };
-
   return (
     <>
       <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
@@ -74,8 +105,8 @@ export default function ImageCropper() {
             ref={cropperRef}
             style={containerStyle}
             src={srcImage}
-            viewMode={1}
             aspectRatio={initialRatio}
+            viewMode={1}
             guides={true}
             crop={onCrop}
             // initialAspectRatio={0}
@@ -88,10 +119,15 @@ export default function ImageCropper() {
             // checkOrientation={false}
           />
           <ImageRatio />
-          <Button onClick={handleDownload}>Save</Button>
+          <Button onClick={handleUpload} disabled={isLoading ? true : false}>
+            Crop & Save
+          </Button>
+
+          {error && <div className="text-red-700">{error.message}</div>}
+
           {isUploadError && (
             <div className="text-red-700">
-              Can't save image please upload another image!{" "}
+              Can't save image please upload another image!
             </div>
           )}
         </div>
@@ -103,7 +139,7 @@ export default function ImageCropper() {
             </>
           )}
 
-          <ColorEdit />
+          {/* <ColorEdit /> */}
         </div>
       </div>
     </>
