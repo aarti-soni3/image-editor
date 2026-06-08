@@ -145,9 +145,11 @@ export default function ImageCropper() {
       formData.append("imageData", JSON.stringify(imageData));
       formData.append("filterData", JSON.stringify(filterData));
 
-      await crop(formData);
+      const response = await crop(formData);
+      if (response.data) {
+        openInNewWindow(response?.data?.data?.image);
+      }
 
-      openInNewWindow(data?.data?.image?.imageLink);
       showSuccessToast(data?.message || data?.data?.message);
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);

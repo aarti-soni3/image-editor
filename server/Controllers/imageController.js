@@ -62,13 +62,13 @@ const cropImage = async (req, res) => {
 
   console.log('upload link before create: ', uploadLink)
   const data = {
-    imageLink: uploadLink?.secure_url || uploadLink.url,
+    imageLink: uploadLink?.secure_url || uploadLink?.url,
     userId: decodedUser.data.userId
   }
 
   try {
     const image = await Image.create(data);
-    return res.status(200).json({ data: { image: image, message: "image uploaded" } });
+    return res.status(200).json({ data: { image: uploadLink.secure_url }, message: "image uploaded" });
   } catch (error) {
     console.log(error)
   }
