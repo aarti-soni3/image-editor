@@ -3,15 +3,29 @@ const { Caman } = require("caman");
 const fs = require("fs");
 const { cloudinary, uploadImageToServer } = require("../utils/cloudinaryConfig");
 const { deleteTempFile } = require("../utils/fileUtility");
+const { verifyToken } = require("../utils/jsonwebtoken-utility");
+const Image = require("../Models/Image");
 
 const cropImage = async (req, res) => {
   const { file } = req;
+
+  if (!file)
+    return res.status(400).json({ message: 'No file Uploaded!' })
+
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token)
+    return res.status(401).json({ message: 'Invalid or missing Token!' });
+
+  const decodedUser = await verifyToken(token, process.env.ACCESSTOKEN_KEY);
+  console.log(decodedUser)
+  if (!decodedUser)
+    return res.status(403).json({ message: 'Invalid User!' })
+
   const imageData = JSON.parse(req.body.imageData);
   const filterData = JSON.parse(req.body.filterData);
   const { width, height, x, y, rotate, scaleX, scaleY } = imageData;
   const { brightness, saturation, exposure, contrast, vibrance, sepia, hue,/*sharpen*/ } = filterData;
-
-  console.log('data :::::: ', file.filename, file.path, imageData, filterData);
 
   const originalImagePath = `uploads/original-images/${file.filename}`;
   const cropImagePath = `uploads/crop-images/output-${file.filename}`;
@@ -21,60 +35,45 @@ const cropImage = async (req, res) => {
     .extract({ left: x, top: y, width: width, height: height })
     .toFile(cropImagePath);
 
-  Caman(`uploads/crop-images/output-${file.filename}`, function () {
-    this.brightness(brightness)
-      .contrast(contrast)
-      .saturation(saturation)
-      .exposure(exposure)
-      .vibrance(vibrance)
-      //   .sharpen(sharpen)
-      .hue(hue)
-      .sepia(sepia);
-    this.render(async function () {
-      const dataURL = this.toBase64();
-      const uploadLink = await uploadImageToServer(dataURL)
-      deleteTempFile(cropImagePath)
-      deleteTempFile(originalImagePath)
+  const uploadLink = await new Promise((resolve, reject) => {
+    Caman(`uploads/crop-images/output-${file.filename}`, function () {
+      this.brightness(brightness)
+        .contrast(contrast)
+        .saturation(saturation)
+        .exposure(exposure)
+        .vibrance(vibrance)
+        //   .sharpen(sharpen)
+        .hue(hue)
+        .sepia(sepia);
 
-      //   this.save(`uploads/edited-images/output-${file.filename}`, function () {
-      //     console.log("filter completed!!!");
-      //   }),
-
-      // Try nodeSave instead of save if standard save fails
-      // if (this.nodeSave) {
-      //   this.nodeSave(filterImagePath, true);
-      //   deleteTempFile(cropImagePath);
-      //   deleteTempFile(originalImagePath);
-      // } else {
-      //   this.save(filterImagePath);
-      //   deleteTempFile(cropImagePath);
-      //   deleteTempFile(originalImagePath);
-      // }
+      this.render(async function () {
+        try {
+          const dataURL = this.toBase64();
+          const link = await uploadImageToServer(dataURL)
+          deleteTempFile(cropImagePath)
+          deleteTempFile(originalImagePath)
+          resolve(link)
+        } catch (error) {
+          reject(error)
+        }
+      });
     });
-  });
+  })
 
-  //   try {
-  //     await new Promise((resolve, reject) => {
-  //       Caman(file, function () {
-  //         this.brightness(brightness)
-  //           .contrast(contrast)
-  //           .saturation(saturation)
-  //           .exposure(exposure)
-  //           .vibrance(vibrance);
+  console.log('upload link before create: ', uploadLink)
+  const data = {
+    imageLink: uploadLink?.secure_url || uploadLink.url,
+    userId: decodedUser.data.userId
+  }
 
-  //         this.render(() => {
-  //           //   this.save(tempPath, () => {
-  //           console.log("Caman filtering complete");
-  //           resolve();
-  //           //   });
-  //         });
-  //       }).on("error", (err) => reject(err)); // Handle Caman errors
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
+  try {
+    const image = await Image.create(data);
+    return res.status(200).json({ data: { image: image, message: "image uploaded" } });
+  } catch (error) {
+    console.log(error)
+  }
 
-  res.status(200).json({ data: { file: file, message: "image uploaded" } });
+  return res.status(500).json({ message: "Something went wrong!" });
 };
 
 module.exports = { cropImage }

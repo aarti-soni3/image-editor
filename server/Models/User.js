@@ -50,7 +50,7 @@ const User = sequelize.define(
 
 
 const syncTable = async () => {
-    await sequelize.sync({ force: true })
+    await sequelize.sync({ alter: false })
 };
 
 // syncTable();

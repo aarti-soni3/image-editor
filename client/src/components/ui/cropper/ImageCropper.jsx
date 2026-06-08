@@ -92,6 +92,10 @@ export default function ImageCropper() {
     img.src = croppedImage;
   }, [croppedImage]);
 
+  const openInNewWindow = (url) => {
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   // const handleDownload = () => {
   //   if (isUploadError) return;
 
@@ -142,6 +146,8 @@ export default function ImageCropper() {
       formData.append("filterData", JSON.stringify(filterData));
 
       await crop(formData);
+
+      openInNewWindow(data?.data?.image?.imageLink);
       showSuccessToast(data?.message || data?.data?.message);
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);
