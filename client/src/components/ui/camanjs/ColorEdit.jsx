@@ -1,6 +1,8 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { CustomSlider } from "@/components/ui/camanjs/CustomSlider";
 import { FilterContext } from "@/context/createContext";
+import { Button } from "../shadcn templates/button";
+const Caman = window.Caman;
 
 export const ColorEdit = ({ croppedImageRef }) => {
   const {
@@ -14,6 +16,13 @@ export const ColorEdit = ({ croppedImageRef }) => {
     setContrast,
     vibrance,
     setVibrance,
+    // sharpen,
+    // setSharpen,
+    hue,
+    setHue,
+    sepia,
+    setSepia,
+    resetFilter,
   } = useContext(FilterContext);
 
   // useEffect(() => {
@@ -41,85 +50,173 @@ export const ColorEdit = ({ croppedImageRef }) => {
   // }, []);
 
   // useEffect(() => {
-  //   if (!Caman || !croppedImageRef.current) return;
+  //   const imgElement = croppedImageRef.current;
 
-  //   Caman(croppedImageRef.current, function () {
-  //     this.revert(false);
+  //   if (
+  //     !Caman ||
+  //     !imgElement ||
+  //     !imgElement?.nodename !== "IMG" ||
+  //     !imgElement.complete ||
+  //     imgElement.naturalWidth !== 0
+  //   )
+  //     return;
+
+  //   // if (imgElement.complete && imgElement.naturalWidth !== 0) {
+  //   //   applyFilter(imgElement);
+  //   // } else {
+  //   //   console.log(imgElement, imgElement?.nodename, Caman);
+  //   //   const handleLoad = () => {
+  //   //     applyFilter(imgElement);
+  //   //   };
+
+  //   //   imgElement.addEventListener("load", handleLoad);
+  //   //   return () => imgElement.removeEventListener("load", handleLoad);
+  //   // }
+
+  //   // const applyFilter = (imgElement) => {
+
+  //   console.log("reached!");
+
+  //   new Caman(imgElement, function () {
+  //     console.log(brightness, saturation, exposure, contrast, vibrance);
+  //     console.log("running");
+  //     // this.revert(false);
   //     this.brightness(brightness);
   //     this.saturation(saturation);
   //     this.exposure(exposure);
   //     this.contrast(contrast);
   //     this.vibrance(vibrance);
-
-  //     this.render();
+  //     this.render(function () {
+  //       console.log("DONE");
+  //     });
   //   });
-  // }, [
-  //   brightness,
-  //   saturation,
-  //   exposure,
-  //   contrast,
-  //   vibrance,
-  //   croppedImageRef,
-  //   Caman,
-  // ]);
+  //   // };
+  // }, [brightness, saturation, exposure, contrast, vibrance]);
+
+  useEffect(() => {
+    const canvas = croppedImageRef.current;
+    const caman = window?.Caman || Caman;
+
+    if (!caman || !canvas || canvas.nodeName?.toUpperCase() !== "CANVAS")
+      return;
+
+    caman(canvas, function () {
+      this.revert(false);
+      this.brightness(brightness);
+      this.saturation(saturation);
+      this.exposure(exposure);
+      this.contrast(contrast);
+      this.vibrance(vibrance);
+      this.sepia(sepia);
+      // this.sharpen(sharpen);
+      this.hue(hue);
+      this.render();
+    });
+  }, [
+    brightness,
+    saturation,
+    exposure,
+    contrast,
+    vibrance,
+    sepia,
+    // sharpen,
+    hue,
+    croppedImageRef,
+  ]);
 
   return (
-    <div>
-      <CustomSlider
-        label="Brightness"
-        value={brightness}
+    <div className="flex flex-col gap-4">
+      <div>
+        <CustomSlider
+          label="Brightness"
+          value={brightness}
+          setValue={(value) => {
+            setBrightness(value);
+          }}
+          min={-100}
+          max={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        <CustomSlider
+          label="Saturation"
+          value={saturation}
+          setValue={(value) => {
+            setSaturation(value);
+          }}
+          minValue={-100}
+          maxValue={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        <CustomSlider
+          label="Exposure"
+          value={exposure}
+          setValue={(value) => {
+            setExposure(value);
+          }}
+          minValue={-100}
+          maxValue={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        <CustomSlider
+          label="Contrast"
+          value={contrast}
+          setValue={(value) => {
+            setContrast(value);
+          }}
+          minValue={-100}
+          maxValue={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        <CustomSlider
+          label="Vibrance"
+          value={vibrance}
+          setValue={(value) => {
+            setVibrance(value);
+          }}
+          minValue={-100}
+          maxValue={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        {/* <CustomSlider
+        label="sharpen"
+        value={sharpen}
         setValue={(value) => {
-          setBrightness(value);
+          setSharpen(value);
         }}
-        maxValue={2}
         minValue={0}
+        maxValue={1}
         step={0.1}
         croppedImageRef={croppedImageRef}
-      />
-      <CustomSlider
-        label="saturation"
-        value={saturation}
-        setValue={(value) => {
-          setSaturation(value);
-        }}
-        maxValue={2}
-        minValue={0}
-        step={0.1}
-        croppedImageRef={croppedImageRef}
-      />
-      <CustomSlider
-        label="exposure"
-        value={exposure}
-        setValue={(value) => {
-          setExposure(value);
-        }}
-        maxValue={2}
-        minValue={0}
-        step={0.1}
-        croppedImageRef={croppedImageRef}
-      />
-      <CustomSlider
-        label="contrast"
-        value={contrast}
-        setValue={(value) => {
-          setContrast(value);
-        }}
-        maxValue={2}
-        minValue={0}
-        step={0.1}
-        croppedImageRef={croppedImageRef}
-      />
-      <CustomSlider
-        label="vibrance"
-        value={vibrance}
-        setValue={(value) => {
-          setVibrance(value);
-        }}
-        maxValue={2}
-        minValue={0}
-        step={0.1}
-        croppedImageRef={croppedImageRef}
-      />
+      /> */}
+        <CustomSlider
+          label="Hue"
+          value={hue}
+          setValue={(value) => {
+            setHue(value);
+          }}
+          minValue={0}
+          maxValue={360}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+        <CustomSlider
+          label="Sepia"
+          value={sepia}
+          setValue={(value) => {
+            setSepia(value);
+          }}
+          minValue={0}
+          maxValue={100}
+          step={1}
+          croppedImageRef={croppedImageRef}
+        />
+      </div>
+      <Button onClick={resetFilter}>Reset Filter</Button>
     </div>
   );
 };

@@ -4,7 +4,11 @@ import "cropperjs/dist/cropper.css";
 import { Button } from "../shadcn templates/button";
 import { ImageRatio } from "./ImageRatio";
 import { useContext } from "react";
-import { CropperContext, FilterContext } from "@/context/createContext";
+import {
+  CropperContext,
+  FilterContext,
+  ToastContext,
+} from "@/context/createContext";
 import { useCropMutation } from "@/store/services/imageApiSlice";
 import { ColorEdit } from "../camanjs/ColorEdit";
 
@@ -15,43 +19,78 @@ export default function ImageCropper() {
     isUploadError,
   } = useContext(CropperContext);
 
-  const { filterStyle } = useContext(FilterContext);
-  console.log(filterStyle);
+  const {
+    brightness,
+    saturation,
+    exposure,
+    contrast,
+    vibrance,
+    /*sharpen,*/
+    sepia,
+    hue,
+    resetFilter,
+    resetAndApply,
+  } = useContext(FilterContext);
+
+  const { showErrorToast, showSuccessToast } = useContext(ToastContext);
 
   const [crop, { data, isLoading, error }] = useCropMutation();
 
   const cropperRef = useRef(null);
-  const croppedImageRef = useRef(null);
   const currentImage = useRef(srcImage);
+  const croppedImageRef = useRef(null);
+  const [croppedImage, setCroppedImage] = useState(null);
   const containerStyle = { height: "100%", width: "75%" };
   const initialRatio = aspectRatio?.size
     ? aspectRatio.size.x / aspectRatio.size.y
     : 16 / 9;
 
-  const [croppedImage, setCroppedImage] = useState(null);
-
+  //called when aspect ratio changes
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
     if (cropper && aspectRatio?.size) {
       const ratio = aspectRatio.size.x / aspectRatio.size.y;
       cropper.setAspectRatio(ratio);
+      resetAndApply();
     }
-  }, [aspectRatio]);
+  }, [aspectRatio, resetAndApply]);
 
-  useEffect(() => {
-    const cropper = cropperRef.current?.cropper;
-    if (cropper && srcImage && srcImage !== currentImage.current) {
-      cropper.replace(srcImage);
-      currentImage.current = srcImage;
-    }
-  }, [srcImage]);
-
+  //called when cropper box selection changes
   const onCrop = () => {
     const cropper = cropperRef.current?.cropper;
     const croppedCanvas = cropper.getCroppedCanvas();
     setCroppedImage(croppedCanvas.toDataURL());
-    // console.log("image croper data : ", cropper.getCroppedCanvas().toDataURL());
   };
+
+  //called when src image changes
+  useEffect(() => {
+    const cropper = cropperRef.current?.cropper;
+
+    if (cropper && srcImage && srcImage !== currentImage.current) {
+      cropper.replace(srcImage);
+      currentImage.current = srcImage;
+      resetFilter();
+      setCroppedImage(null);
+    }
+  }, [srcImage, resetFilter]);
+
+  useEffect(() => {
+    const canvas = croppedImageRef.current;
+    if (!canvas || !croppedImage) return;
+
+    canvas.removeAttribute("data-caman-id");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+
+    img.src = croppedImage;
+  }, [croppedImage]);
 
   // const handleDownload = () => {
   //   if (isUploadError) return;
@@ -87,17 +126,25 @@ export default function ImageCropper() {
         type: blob.type || "image/jpeg",
       });
 
-      console.log("file : ", file);
-      console.log("imageData : ", imageData);
+      const filterData = {
+        brightness,
+        saturation,
+        exposure,
+        contrast,
+        vibrance,
+        // sharpen,
+        sepia,
+        hue,
+      };
 
       formData.append("image", file);
       formData.append("imageData", JSON.stringify(imageData));
+      formData.append("filterData", JSON.stringify(filterData));
 
-      const res = await crop(formData);
-      console.log("res data : ", res.data);
-      console.log("mutation data : ", data);
+      await crop(formData);
+      showSuccessToast(data?.message || data?.data?.message);
     } catch (error) {
-      console.log("errrrr : ", error.message);
+      showErrorToast(error?.data?.message || error?.message);
     }
   };
 
@@ -114,6 +161,7 @@ export default function ImageCropper() {
             viewMode={1}
             guides={true}
             crop={onCrop}
+            ready={onCrop}
             // initialAspectRatio={0}
             // zoomTo={0.5}
             // minCropBoxHeight={10}
@@ -125,7 +173,7 @@ export default function ImageCropper() {
           />
           <ImageRatio />
           <Button onClick={handleUpload} disabled={isLoading ? true : false}>
-            Crop & Save
+            Apply & Save
           </Button>
 
           {error && <div className="text-red-700">{error.message}</div>}
@@ -140,12 +188,10 @@ export default function ImageCropper() {
           {croppedImage && (
             <>
               <h4>Cropped Image Preview</h4>
-              <img
+              <canvas
                 ref={croppedImageRef}
                 id="cropped-image"
-                src={croppedImage}
                 className="w-100"
-                style={filterStyle}
               />
             </>
           )}

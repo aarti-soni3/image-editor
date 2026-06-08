@@ -4,10 +4,11 @@ const imageController = require('../Controllers/imageController');
 const multer = require('multer');
 const { catchAsync } = require('../utils/catchAsyncUtility');
 const path = require('path')
+// const { storage } = require('../utils/cloudinaryConfig');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/')
+        cb(null, 'uploads/original-images')
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname)
@@ -16,8 +17,7 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage })
-
+const upload = multer({ storage });
 router.route('/crop').post(upload.single('image'), catchAsync(imageController.cropImage))
 
 module.exports = router
