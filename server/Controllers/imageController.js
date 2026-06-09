@@ -12,7 +12,7 @@ const cropImage = async (req, res) => {
   const imageData = JSON.parse(req.body.imageData);
   const filterData = JSON.parse(req.body.filterData);
   const { width, height, x, y, rotate, scaleX, scaleY } = imageData;
-  const { brightness, saturation, exposure, contrast, vibrance, sepia, hue,/*sharpen*/ } = filterData;
+  const { brightness, saturation, exposure, contrast, vibrance, sepia, hue, sharpen } = filterData;
 
   const originalImagePath = `uploads/original-images/${file.filename}`;
   const cropImagePath = `uploads/crop-images/output-${file.filename}`;
@@ -29,7 +29,7 @@ const cropImage = async (req, res) => {
         .saturation(saturation)
         .exposure(exposure)
         .vibrance(vibrance)
-        //   .sharpen(sharpen)
+        .sharpen(sharpen)
         .hue(hue)
         .sepia(sepia);
 

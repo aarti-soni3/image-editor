@@ -2,9 +2,16 @@ import { FilterContext } from "@/context/createContext";
 import { useContext, useEffect } from "react"
 const Caman = window.Caman;
 
-export const useCamanFilter = (canvasRef, isCanvasReady) => {
+Caman.Filter.register("sharpen", function (amount) {
+    amount = amount / 100;
+    return this.processKernel("Sharpen", [
+        0, -amount, 0,
+        -amount, 4 * amount + 1, -amount,
+        0, -amount, 0
+    ]);
+});
 
-    // const timerRef = useRef(null);
+export const useCamanFilter = (canvasRef, isCanvasReady) => {
 
     const {
         brightness,
@@ -12,23 +19,16 @@ export const useCamanFilter = (canvasRef, isCanvasReady) => {
         exposure,
         contrast,
         vibrance,
-        /*sharpen,*/
+        sharpen,
         sepia,
         hue,
-        // resetFilter,
-        // reapplyFilter,
     } = useContext(FilterContext);
-
-    console.log('isCanvasReady : ', isCanvasReady)
 
     useEffect(() => {
 
-        // clearTimeout(timerRef);
         const canvas = canvasRef.current;
         const caman = window?.Caman || Caman;
 
-        // timerRef.current = setTimeout(() => {
-        console.log('Running...')
         if (
             !caman ||
             !canvas ||
@@ -46,12 +46,9 @@ export const useCamanFilter = (canvasRef, isCanvasReady) => {
             this.contrast(contrast);
             this.vibrance(vibrance);
             this.sepia(sepia);
-            // this.sharpen(sharpen);
+            this.sharpen(sharpen);
             this.hue(hue);
             this.render();
         });
-
-        // },300)
-        // return () => clearTimeout(timerRef)
-    }, [canvasRef, brightness, saturation, exposure, contrast, vibrance, sepia, hue, isCanvasReady])
+    }, [canvasRef, brightness, saturation, exposure, contrast, vibrance, sepia, hue, sharpen, isCanvasReady])
 }

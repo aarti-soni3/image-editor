@@ -9,7 +9,6 @@ export const ImageUpload = () => {
 
   const {
     register,
-    // handleSubmit,
     watch,
     formState: { errors },
   } = useForm({ mode: "onChange" });
@@ -32,13 +31,7 @@ export const ImageUpload = () => {
     }
   }, [selectedFile, setImageSrc]);
 
-  // const onSubmit = (data) => {
-  //   console.log(data);
-  // };
-
   return (
-    <>
-      {/* <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data"> */}
       <CustomField
         fieldLabel="Upload Image"
         htmlFor="image"
@@ -50,7 +43,5 @@ export const ImageUpload = () => {
         aria-invalid={errors.image ? true : false}
         accept="image/*"
       />
-      {/* </form> */}
-    </>
   );
 };
