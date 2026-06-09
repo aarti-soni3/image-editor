@@ -23,20 +23,26 @@ export const FilterProvider = ({ children }) => {
   };
 
   const reapplyFilter = () => {
-    setBrightness(brightness);
-    setSaturation(saturation);
-    setExposure(exposure);
-    setContrast(contrast);
-    setVibrance(vibrance);
-    setSharpen(sharpen);
-    setHue(hue);
-    setSepia(sepia);
-  };
+    const b = brightness,
+      s = saturation,
+      e = exposure,
+      c = contrast,
+      v = vibrance,
+      sp = sharpen,
+      h = hue,
+      se = sepia;
 
-  const resetAndApply=()=>{
     resetFilter();
-    reapplyFilter();
-  }
+
+    setBrightness(b);
+    setSaturation(s);
+    setExposure(e);
+    setContrast(c);
+    setVibrance(v);
+    setSharpen(sp);
+    setHue(h);
+    setSepia(se);
+  };
 
   return (
     <FilterContext.Provider
@@ -59,7 +65,6 @@ export const FilterProvider = ({ children }) => {
         setSepia,
         resetFilter,
         reapplyFilter,
-        resetAndApply,
       }}
     >
       {children}

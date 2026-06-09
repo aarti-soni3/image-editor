@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useContext/*, useEffect*/ } from "react";
 import { CustomSlider } from "@/components/ui/camanjs/CustomSlider";
 import { FilterContext } from "@/context/createContext";
 import { Button } from "../shadcn templates/button";
-const Caman = window.Caman;
+// const Caman = window.Caman;
 
 export const ColorEdit = ({ croppedImageRef }) => {
   const {
@@ -93,36 +93,39 @@ export const ColorEdit = ({ croppedImageRef }) => {
   //   // };
   // }, [brightness, saturation, exposure, contrast, vibrance]);
 
-  useEffect(() => {
-    const canvas = croppedImageRef.current;
-    const caman = window?.Caman || Caman;
+  // useEffect(() => {
+  //   const canvas = croppedImageRef.current;
+  //   const caman = window?.Caman || Caman;
 
-    if (!caman || !canvas || canvas.nodeName?.toUpperCase() !== "CANVAS")
-      return;
+  //   if (!caman || !canvas || canvas.nodeName?.toUpperCase() !== "CANVAS")
+  //     return;
 
-    caman(canvas, function () {
-      this.revert(false);
-      this.brightness(brightness);
-      this.saturation(saturation);
-      this.exposure(exposure);
-      this.contrast(contrast);
-      this.vibrance(vibrance);
-      this.sepia(sepia);
-      // this.sharpen(sharpen);
-      this.hue(hue);
-      this.render();
-    });
-  }, [
-    brightness,
-    saturation,
-    exposure,
-    contrast,
-    vibrance,
-    sepia,
-    // sharpen,
-    hue,
-    croppedImageRef,
-  ]);
+  //   console.log('width-height :',canvas.width, canvas.height);
+  //   console.log('datacaman id : ',canvas.getAttribute("data-caman-id"));
+
+  //   caman(canvas, function () {
+  //     this.revert(false);
+  //     this.brightness(brightness);
+  //     this.saturation(saturation);
+  //     this.exposure(exposure);
+  //     this.contrast(contrast);
+  //     this.vibrance(vibrance);
+  //     this.sepia(sepia);
+  //     // this.sharpen(sharpen);
+  //     this.hue(hue);
+  //     this.render();
+  //   });
+  // }, [
+  //   brightness,
+  //   saturation,
+  //   exposure,
+  //   contrast,
+  //   vibrance,
+  //   sepia,
+  //   // sharpen,
+  //   hue,
+  //   croppedImageRef,
+  // ]);
 
   return (
     <div className="flex flex-col gap-4">

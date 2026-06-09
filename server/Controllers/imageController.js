@@ -60,7 +60,6 @@ const cropImage = async (req, res) => {
     });
   })
 
-  console.log('upload link before create: ', uploadLink)
   const data = {
     imageLink: uploadLink?.secure_url || uploadLink?.url,
     userId: decodedUser.data.userId

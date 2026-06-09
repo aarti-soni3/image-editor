@@ -11,6 +11,7 @@ import {
 } from "@/context/createContext";
 import { useCropMutation } from "@/store/services/imageApiSlice";
 import { ColorEdit } from "../camanjs/ColorEdit";
+import { useCamanFilter } from "@/hooks/useCamanFilter.js";
 
 export default function ImageCropper() {
   const {
@@ -29,11 +30,11 @@ export default function ImageCropper() {
     sepia,
     hue,
     resetFilter,
-    resetAndApply,
   } = useContext(FilterContext);
 
   const { showErrorToast, showSuccessToast } = useContext(ToastContext);
 
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [crop, { data, isLoading, error }] = useCropMutation();
 
   const cropperRef = useRef(null);
@@ -45,24 +46,23 @@ export default function ImageCropper() {
     ? aspectRatio.size.x / aspectRatio.size.y
     : 16 / 9;
 
-  //called when aspect ratio changes
+  useCamanFilter(croppedImageRef, isCanvasReady);
+
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
     if (cropper && aspectRatio?.size) {
       const ratio = aspectRatio.size.x / aspectRatio.size.y;
       cropper.setAspectRatio(ratio);
-      resetAndApply();
     }
-  }, [aspectRatio, resetAndApply]);
+  }, [aspectRatio]); //called when aspect ratio changes
 
-  //called when cropper box selection changes
   const onCrop = () => {
     const cropper = cropperRef.current?.cropper;
     const croppedCanvas = cropper.getCroppedCanvas();
+    setIsCanvasReady(false);
     setCroppedImage(croppedCanvas.toDataURL());
-  };
+  }; //called when cropper box selection changes
 
-  //called when src image changes
   useEffect(() => {
     const cropper = cropperRef.current?.cropper;
 
@@ -71,14 +71,16 @@ export default function ImageCropper() {
       currentImage.current = srcImage;
       resetFilter();
       setCroppedImage(null);
+      setIsCanvasReady(false);
     }
-  }, [srcImage, resetFilter]);
+  }, [srcImage, resetFilter]); //called when src image changes
 
   useEffect(() => {
     const canvas = croppedImageRef.current;
-    if (!canvas || !croppedImage) return;
 
-    canvas.removeAttribute("data-caman-id");
+    if (!canvas || !croppedImage || canvas.nodeName?.toUpperCase() !== "CANVAS")
+      return;
+
     const ctx = canvas.getContext("2d");
     const img = new Image();
 
@@ -86,34 +88,18 @@ export default function ImageCropper() {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.removeAttribute("data-caman-id");
       ctx.drawImage(img, 0, 0);
+      setIsCanvasReady(true);
     };
 
     img.src = croppedImage;
   }, [croppedImage]);
 
   const openInNewWindow = (url) => {
+    console.log("url : ", url);
     if (url) window.open(url, "_blank", "noopener,noreferrer");
   };
-
-  // const handleDownload = () => {
-  //   if (isUploadError) return;
-
-  //   const cropper = cropperRef.current?.cropper;
-  //   const croppedCanvas = cropper.getCroppedCanvas();
-
-  //   if (croppedCanvas) {
-  //     const dataURL = croppedCanvas.toDataURL("image/png");
-
-  //     const downloadLink = document.createElement("a");
-  //     downloadLink.href = dataURL;
-  //     downloadLink.download = "cropped-img.png";
-
-  //     document.body.appendChild(downloadLink);
-  //     downloadLink.click();
-  //     document.body.removeChild(downloadLink);
-  //   }
-  // };
 
   const handleUpload = async () => {
     const cropper = cropperRef.current?.cropper;
@@ -147,9 +133,13 @@ export default function ImageCropper() {
 
       const response = await crop(formData);
       if (response.data) {
+        console.log(response.data.data.image);
+        console.log(response.data);
         openInNewWindow(response?.data?.data?.image);
       }
 
+      console.log('data msg : ',data?.message);
+      console.log('data data msg : ',data?.data?.message);
       showSuccessToast(data?.message || data?.data?.message);
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);
@@ -170,17 +160,15 @@ export default function ImageCropper() {
             guides={true}
             crop={onCrop}
             ready={onCrop}
-            // initialAspectRatio={0}
-            // zoomTo={0.5}
-            // minCropBoxHeight={10}
-            // minCropBoxWidth={10}
-            // background={false}
-            // responsive={true}
-            // autoCropArea={1}
-            // checkOrientation={false}
+            // cropend={onCrop}
+            // initialAspectRatio={0} zoomTo={0.5} minCropBoxHeight={10} minCropBoxWidth={10}
+            // background={false} responsive={true} autoCropArea={1} checkOrientation={false}
           />
           <ImageRatio />
-          <Button onClick={handleUpload} disabled={isLoading ? true : false}>
+          <Button
+            onClick={handleUpload}
+            disabled={isLoading || isUploadError ? true : false}
+          >
             Apply & Save
           </Button>
 
