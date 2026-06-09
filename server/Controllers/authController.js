@@ -30,16 +30,6 @@ const register = async (req, res) => {
         password: password
     }
 
-    let findUser = await User.findOne({ where: { username: data.username } });
-
-    if (findUser)
-        return res.status(400).json({ message: 'Username already exist!' })
-
-    findUser = await User.findOne({ where: { email: data.email } });
-
-    if (findUser)
-        return res.status(400).json({ message: 'Email already exist!' })
-
     const user = await User.create(data);
     const accessToken = generateAccessToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
     const refreshToken = generateRefreshToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
@@ -48,21 +38,7 @@ const register = async (req, res) => {
 }
 
 const access = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token)
-        return res.status(400).json({ data: { message: 'Access denied...No token available!' } });
-
-    jwt.verify(token, process.env.ACCESSTOKEN_KEY, (error, decoded) => {
-        if (error) {
-            if (error.name === 'TokenExpiredError')
-                return res.status(401).json({ data: { message: 'Token expired!' } });
-
-            return res.status(403).json({ data: { message: 'Invalid token!' } });
-        }
-        return res.status(200).json({ data: { user: decoded?.data, message: 'success' } });
-    });
+    return res.status(200).json({ data: { user: req.decodedUser?.data, message: 'success' } });
 }
 
 const refresh = async (req, res) => {

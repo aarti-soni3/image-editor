@@ -97,8 +97,12 @@ export default function ImageCropper() {
   }, [croppedImage]);
 
   const openInNewWindow = (url) => {
-    console.log("url : ", url);
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    const newWindow = window.open("about:blank", "_blank");
+    setTimeout(() => {
+      if (newWindow && url) {
+        newWindow.location.href = url;
+      }
+    }, 1000);
   };
 
   const handleUpload = async () => {
@@ -138,8 +142,8 @@ export default function ImageCropper() {
         openInNewWindow(response?.data?.data?.image);
       }
 
-      console.log('data msg : ',data?.message);
-      console.log('data data msg : ',data?.data?.message);
+      console.log("data msg : ", data?.message);
+      console.log("data data msg : ", data?.data?.message);
       showSuccessToast(data?.message || data?.data?.message);
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);

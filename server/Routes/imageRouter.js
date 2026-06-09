@@ -3,8 +3,11 @@ const router = express.Router();
 const imageController = require('../Controllers/imageController');
 const multer = require('multer');
 const { catchAsync } = require('../utils/catchAsyncUtility');
-const path = require('path')
+const path = require('path');
+const { validate } = require('../utils/expressValidator-utility');
+const { body } = require('express-validator')
 // const { storage } = require('../utils/cloudinaryConfig');
+const authMiddleware = require('../middleware/authMiddlware');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -18,6 +21,10 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage });
-router.route('/crop').post(upload.single('image'), catchAsync(imageController.cropImage))
+router.route('/crop').post(upload.single('image'), authMiddleware.verifyToken, validate([body('').custom((value, { req }) => {
+    if (!req.file)
+        throw new Error('File upload is required!');
+    return true;
+})]), catchAsync(imageController.cropImage))
 
 module.exports = router

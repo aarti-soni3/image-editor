@@ -9,19 +9,6 @@ const Image = require("../Models/Image");
 const cropImage = async (req, res) => {
   const { file } = req;
 
-  if (!file)
-    return res.status(400).json({ message: 'No file Uploaded!' })
-
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token)
-    return res.status(401).json({ message: 'Invalid or missing Token!' });
-
-  const decodedUser = await verifyToken(token, process.env.ACCESSTOKEN_KEY);
-  console.log(decodedUser)
-  if (!decodedUser)
-    return res.status(403).json({ message: 'Invalid User!' })
-
   const imageData = JSON.parse(req.body.imageData);
   const filterData = JSON.parse(req.body.filterData);
   const { width, height, x, y, rotate, scaleX, scaleY } = imageData;
@@ -62,7 +49,7 @@ const cropImage = async (req, res) => {
 
   const data = {
     imageLink: uploadLink?.secure_url || uploadLink?.url,
-    userId: decodedUser.data.userId
+    userId: req?.decodedUser?.data?.userId
   }
 
   try {
