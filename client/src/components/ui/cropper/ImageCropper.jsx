@@ -123,8 +123,6 @@ export default function ImageCropper() {
           </body>
         </html>
       `;
-
-      console.log(newWindow.document.documentElement.innerHTML);
     }
 
     try {
