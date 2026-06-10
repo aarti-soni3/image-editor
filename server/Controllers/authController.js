@@ -38,7 +38,7 @@ const register = async (req, res) => {
 }
 
 const access = async (req, res) => {
-    return res.status(200).json({ data: { user: req.decodedUser?.data, message: 'success' } });
+    return res.status(200).json({ user: req.decodedUser?.data, message: 'success' });
 }
 
 const refresh = async (req, res) => {

@@ -30,7 +30,6 @@ export function LoginForm({ className, ...props }) {
 
   const onSubmit = async (formData) => {
     try {
-      console.log("formdata :", formData);
       const data = await login(formData).unwrap();
 
       if (data) {
