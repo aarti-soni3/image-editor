@@ -12,7 +12,7 @@ const cropImage = async (req, res) => {
 
   const imageData = JSON.parse(req.body.imageData);
   const filterData = JSON.parse(req.body.filterData);
-  const { width, height, x, y, rotate, scaleX, scaleY } = imageData;
+  const { width, height, x, y } = imageData;
   const { brightness, saturation, exposure, contrast, vibrance, sepia, hue, sharpen } = filterData;
 
   const originalImagePath = `uploads/original-images/${file.filename}`;

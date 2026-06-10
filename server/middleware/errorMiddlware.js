@@ -1,8 +1,8 @@
 module.exports.errorMiddlware = (err, req, res, next) => {
 
-    const statusCode = err.statusCode;
+    const statusCode = err.statusCode|| 500;
     const message = err.message;
     console.log('in err middlware : ', statusCode, message)
 
-    res.status(statusCode).json({ message: message });
+    return res.status(statusCode).json({ message: message });
 }

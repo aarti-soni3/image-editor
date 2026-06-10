@@ -21,10 +21,18 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({ storage });
-router.route('/crop').post(upload.single('image'), authMiddleware.verifyToken, validate([body('').custom((value, { req }) => {
-    if (!req.file)
-        throw new Error('File upload is required!');
-    return true;
-})]), asyncHandler(imageController.cropImage))
+router.route('/crop').post(
+    upload.single('image'),
+    authMiddleware.verifyToken,
+    validate([
+        body('filterData').exists().withMessage('Filter data is required for filtering!'),
+        body('imageData').exists().withMessage('Image crop data is required for cropping an image!'),
+        body('').custom((value, { req }) => {
+            if (!req.file)
+                throw new Error('File upload is required!');
+            return true;
+        })
+    ]),
+    asyncHandler(imageController.cropImage))
 
 module.exports = router
