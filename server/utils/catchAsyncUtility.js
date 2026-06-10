@@ -1,4 +1,4 @@
-module.exports.catchAsync = (fn) => {
+module.exports.asyncHandler = (fn) => {
     return ((req, res, next) => {
         const promise = fn(req, res, next)
 

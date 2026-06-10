@@ -191,7 +191,7 @@ export default function ImageCropper() {
           onClick={handleUpload}
           disabled={isLoading || isUploadError ? true : false}
         >
-          {isProcessing ? "Processing image" : "Apply Filter"}
+          {isProcessing ? "Processing image" : "Apply & View"}
         </Button>
 
         {error && <div className="text-red-700">{error.message}</div>}

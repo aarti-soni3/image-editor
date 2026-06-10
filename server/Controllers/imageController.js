@@ -5,6 +5,7 @@ const { cloudinary, uploadImageToServer } = require("../utils/cloudinaryConfig")
 const { deleteTempFile } = require("../utils/fileUtility");
 const { verifyToken } = require("../utils/jsonwebtoken-utility");
 const Image = require("../Models/Image");
+const AppError = require("../utils/AppError");
 
 const cropImage = async (req, res) => {
   const { file } = req;
@@ -52,14 +53,11 @@ const cropImage = async (req, res) => {
     userId: req?.decodedUser?.data?.userId
   }
 
-  try {
-    const image = await Image.create(data);
-    return res.status(200).json({ image: uploadLink.secure_url, message: "image uploaded" });
-  } catch (error) {
-    console.log(error)
-  }
+  const image = await Image.create(data);
+  return res.status(200).json({ image: uploadLink.secure_url, message: "image uploaded" });
 
-  return res.status(500).json({ message: "Something went wrong!" });
+  throw new AppError(500, "Something went wrong!");
+  // return res.status(500).json({ message: "Something went wrong!" });
 };
 
 module.exports = { cropImage }

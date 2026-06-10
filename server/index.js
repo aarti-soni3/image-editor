@@ -6,6 +6,7 @@ const cors = require('cors')
 const AuthRouter = require('./Routes/authRouter');
 const ImageRouter = require('./Routes/imageRouter');
 const { connectToDatabase } = require('./Config/db');
+const { errorMiddlware } = require('./middleware/errorMiddlware');
 const port = process.env.PORT;
 
 const corsOption = {
@@ -19,6 +20,8 @@ app.use(express.json())
 
 app.use('/api/auth', AuthRouter)
 app.use('/api/image', ImageRouter)
+
+app.use(errorMiddlware);
 
 app.listen(port, () => {
     console.log(`server is running on : ${port}`);

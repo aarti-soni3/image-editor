@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const imageController = require('../Controllers/imageController');
 const multer = require('multer');
-const { catchAsync } = require('../utils/catchAsyncUtility');
+const { asyncHandler } = require('../utils/catchAsyncUtility');
 const path = require('path');
 const { validate } = require('../utils/expressValidator-utility');
 const { body } = require('express-validator')
@@ -25,6 +25,6 @@ router.route('/crop').post(upload.single('image'), authMiddleware.verifyToken, v
     if (!req.file)
         throw new Error('File upload is required!');
     return true;
-})]), catchAsync(imageController.cropImage))
+})]), asyncHandler(imageController.cropImage))
 
 module.exports = router
