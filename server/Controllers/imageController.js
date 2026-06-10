@@ -57,7 +57,6 @@ const cropImage = async (req, res) => {
   return res.status(200).json({ image: uploadLink.secure_url, message: "image uploaded" });
 
   throw new AppError(500, "Something went wrong!");
-  // return res.status(500).json({ message: "Something went wrong!" });
 };
 
 module.exports = { cropImage }

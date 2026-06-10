@@ -17,7 +17,6 @@ const login = async (req, res) => {
         res.status(200).json({ user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Loggedin Successfully!' });
     else
         throw new AppError(400, 'Invalid username or password!');
-    // res.status(400).json({ message: '' });
 }
 
 const register = async (req, res) => {
@@ -42,10 +41,8 @@ const register = async (req, res) => {
 const access = async (req, res) => {
 
     const { decodedUser } = req;
-
     if (decodedUser)
         return res.status(200).json({ user: decodedUser?.data, message: 'success' });
-
     throw new AppError(500, 'Something went wrong!');
 }
 
@@ -55,13 +52,11 @@ const refresh = async (req, res) => {
 
         if (!refreshToken)
             throw new AppError(400, 'Access denied...No token available!');
-        // return res.status(400).json({ message: 'Access denied...No token available!' });
 
         const decodedUser = verifyToken(refreshToken, process.env.REFRESHTOKEN_KEY);
 
         if (!decodedUser)
             throw new AppError(403, 'Invalid or expired token!')
-        // return res.status(403).json({ message: 'Invalid or expired token!' });
 
         const user = decodedUser.data;
         const accessToken = generateAccessToken(user);
@@ -71,11 +66,8 @@ const refresh = async (req, res) => {
     } catch (error) {
         if (error.name === 'TokenExpiredError')
             throw new AppError(403, 'Invalid or expired token!');
-        // return res.status(403).json({ message: 'Invalid or expired token!' });
-
         else
             throw new AppError(500, 'Something went wrong!');
-        // return res.status(500).json({ message: 'Something went wrong!' });
     }
 }
 

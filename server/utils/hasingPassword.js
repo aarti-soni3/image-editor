@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const AppError = require('./AppError');
 
 module.exports.hashPassword = async (password, saltRounds = 12) => {
     try {
@@ -16,17 +17,3 @@ module.exports.comparePassword = async (password, originalPassword) => {
         console.log(error)
     }
 }
-
-// this.comparePassword('1234',)
-
-const test = async () => {
-    const hash = await this.hashPassword('12341234');
-    console.log(hash)
-
-
-
-    const isMached = await this.comparePassword('12341234', hash)
-    console.log(isMached)
-}
-
-// test();

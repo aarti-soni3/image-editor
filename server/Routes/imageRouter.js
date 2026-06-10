@@ -6,7 +6,6 @@ const { asyncHandler } = require('../utils/catchAsyncUtility');
 const path = require('path');
 const { validate } = require('../utils/expressValidator-utility');
 const { body } = require('express-validator')
-// const { storage } = require('../utils/cloudinaryConfig');
 const authMiddleware = require('../middleware/authMiddlware');
 
 const storage = multer.diskStorage({
