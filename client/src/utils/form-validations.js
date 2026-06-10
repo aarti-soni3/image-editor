@@ -103,7 +103,7 @@ export const fileValidation = {
             files?.[0]?.size < 2000000 || 'File must be less than 2MB'
         },
         acceptedFormats: (files) => {
-            ['image/jpeg', 'image/jpg'].includes(files?.[0]?.type) || 'Only JPEG, JPG, PNG files are allowed!'
+            ['image/jpeg', 'image/jpg'].includes(files?.[0]?.type) || 'Only JPEG, JPG files are allowed!'
         },
         validate: async (files) => {
             const file = files?.[0];

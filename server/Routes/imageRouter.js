@@ -4,7 +4,7 @@ const imageController = require('../Controllers/imageController');
 const multer = require('multer');
 const { asyncHandler } = require('../utils/catchAsyncUtility');
 const path = require('path');
-const { validate } = require('../utils/expressValidator-utility');
+const { validate, checkFileValidation } = require('../utils/expressValidator-utility');
 const { body } = require('express-validator')
 const authMiddleware = require('../middleware/authMiddlware');
 
@@ -26,11 +26,7 @@ router.route('/crop').post(
     validate([
         body('filterData').exists().withMessage('Filter data is required for filtering!'),
         body('imageData').exists().withMessage('Image crop data is required for cropping an image!'),
-        body('').custom((value, { req }) => {
-            if (!req.file)
-                throw new Error('File upload is required!');
-            return true;
-        })
+        body('').custom(checkFileValidation),
     ]),
     asyncHandler(imageController.cropImage))
 
