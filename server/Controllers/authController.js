@@ -13,9 +13,9 @@ const login = async (req, res) => {
     const refreshToken = generateRefreshToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
 
     if (isMatched)
-        res.status(200).json({ data: { user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Loggedin Successfully!' } });
+        res.status(200).json({ user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Loggedin Successfully!' });
     else
-        res.status(400).json({ data: { message: 'Invalid username or password!' } });
+        res.status(400).json({ message: 'Invalid username or password!' });
 }
 
 const register = async (req, res) => {
@@ -34,7 +34,7 @@ const register = async (req, res) => {
     const accessToken = generateAccessToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
     const refreshToken = generateRefreshToken({ userId: user.userId, username: user.username, mobile: user.mobile, email: user.email })
 
-    return res.status(201).json({ data: { user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Registered Successfully!' } });
+    return res.status(201).json({ user: user, accessToken: accessToken, refreshToken: refreshToken, message: 'Registered Successfully!' });
 }
 
 const access = async (req, res) => {
@@ -46,23 +46,23 @@ const refresh = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken)
-            return res.status(400).json({ data: { message: 'Access denied...No token available!' } });
+            return res.status(400).json({ message: 'Access denied...No token available!' });
 
         const decodedUser = verifyToken(refreshToken, process.env.REFRESHTOKEN_KEY);
 
         if (!decodedUser)
-            return res.status(403).json({ data: { message: 'Invalid or expired token!' } });
+            return res.status(403).json({ message: 'Invalid or expired token!' });
 
         const user = decodedUser.data;
         const accessToken = generateAccessToken(user);
         const newRefreshToken = generateRefreshToken(user);
 
-        return res.status(200).json({ data: { user, accessToken, refreshToken: newRefreshToken, message: 'Token refreshed successfully!' } });
+        return res.status(200).json({ user, accessToken, refreshToken: newRefreshToken, message: 'Token refreshed successfully!' });
     } catch (error) {
         if (error.name === 'TokenExpiredError')
-            return res.status(403).json({ data: { message: 'Invalid or expired token!' } });
+            return res.status(403).json({ message: 'Invalid or expired token!' });
 
-        return res.status(500).json({ data: { message: 'Something went wrong!' } });
+        return res.status(500).json({ message: 'Something went wrong!' });
     }
 }
 

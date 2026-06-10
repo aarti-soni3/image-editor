@@ -18,8 +18,8 @@ export const CustomSlider = ({ label, value, setValue, maxValue, step }) => {
   };
 
   return (
-    <div className="flex flex-row justify-between align-middle gap-6">
-      <p>{label}</p>
+    <div className="flex flex-row align-middle gap-6">
+      <p className="w-2/5">{label}</p>
       <Slider
         value={displayValue}
         onValueChange={handleValueChange}
@@ -28,7 +28,7 @@ export const CustomSlider = ({ label, value, setValue, maxValue, step }) => {
         step={step}
         className="self-center"
       />
-      <p>{displayValue}</p>
+      <p className="w-1/4">{displayValue}</p>
     </div>
   );
 };

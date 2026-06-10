@@ -54,7 +54,7 @@ const cropImage = async (req, res) => {
 
   try {
     const image = await Image.create(data);
-    return res.status(200).json({ data: { image: uploadLink.secure_url }, message: "image uploaded" });
+    return res.status(200).json({ image: uploadLink.secure_url, message: "image uploaded" });
   } catch (error) {
     console.log(error)
   }

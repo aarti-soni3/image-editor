@@ -26,7 +26,7 @@ export default function ImageCropper() {
     exposure,
     contrast,
     vibrance,
-    /*sharpen,*/
+    sharpen,
     sepia,
     hue,
     resetFilter,
@@ -35,7 +35,8 @@ export default function ImageCropper() {
   const { showErrorToast, showSuccessToast } = useContext(ToastContext);
 
   const [isCanvasReady, setIsCanvasReady] = useState(false);
-  const [crop, { data, isLoading, error }] = useCropMutation();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [crop, { isLoading, error }] = useCropMutation();
 
   const cropperRef = useRef(null);
   const currentImage = useRef(srcImage);
@@ -96,18 +97,35 @@ export default function ImageCropper() {
     img.src = croppedImage;
   }, [croppedImage]);
 
-  const openInNewWindow = (url) => {
-    const newWindow = window.open("about:blank", "_blank");
-    setTimeout(() => {
-      if (newWindow && url) {
-        newWindow.location.href = url;
-      }
-    }, 1000);
-  };
-
   const handleUpload = async () => {
     const cropper = cropperRef.current?.cropper;
     if (!cropper) return;
+    setIsProcessing(true);
+
+    const windowName = `image-processor${Date.now()}`;
+    const newWindow = window.open("about:blank", windowName);
+
+    if (newWindow) {
+      // newWindow.location.replace("about:blank");
+      newWindow.document.documentElement.innerHTML = `
+        <html>
+          <head>
+            <title>Processing Image...</title>
+            <style>
+              body { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background: #f0f2f5; color: #333; }
+              .spinner { border: 4px solid rgba(0,0,0,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #075; animation: spin 1s linear infinite; }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            </style>
+          </head>
+          <body>
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; font-weight: bold; font-size:20px">Applying color correction... Please wait.</p>
+          </body>
+        </html>
+      `;
+
+      console.log(newWindow.document.documentElement.innerHTML);
+    }
 
     try {
       const imageData = cropper.getData(true);
@@ -126,7 +144,7 @@ export default function ImageCropper() {
         exposure,
         contrast,
         vibrance,
-        // sharpen,
+        sharpen,
         sepia,
         hue,
       };
@@ -135,70 +153,71 @@ export default function ImageCropper() {
       formData.append("imageData", JSON.stringify(imageData));
       formData.append("filterData", JSON.stringify(filterData));
 
-      const response = await crop(formData);
-      if (response.data) {
-        console.log(response.data.data.image);
-        console.log(response.data);
-        openInNewWindow(response?.data?.data?.image);
+      const res = await crop(formData);
+
+      if (newWindow && res?.data) {
+        newWindow.location.href = res?.data?.image;
+      } else {
+        throw new Error("No Image URL Received!");
       }
 
-      console.log("data msg : ", data?.message);
-      console.log("data data msg : ", data?.data?.message);
-      showSuccessToast(data?.message || data?.data?.message);
+      showSuccessToast(res?.data?.message || res.data?.data?.message);
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);
+
+      if (newWindow) newWindow.close();
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <>
-      <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
-        <div className="flex flex-col gap-2">
-          <h4>Edit Image Preview</h4>
-          <Cropper
-            ref={cropperRef}
-            style={containerStyle}
-            src={srcImage}
-            aspectRatio={initialRatio}
-            viewMode={1}
-            guides={true}
-            crop={onCrop}
-            ready={onCrop}
-            // cropend={onCrop}
-            // initialAspectRatio={0} zoomTo={0.5} minCropBoxHeight={10} minCropBoxWidth={10}
-            // background={false} responsive={true} autoCropArea={1} checkOrientation={false}
-          />
-          <ImageRatio />
-          <Button
-            onClick={handleUpload}
-            disabled={isLoading || isUploadError ? true : false}
-          >
-            Apply & Save
-          </Button>
+    <div className="flex flex-col xl:flex-row align-middle justify-center xl:justify-normal gap-8">
+      <div className="flex flex-col gap-2">
+        <h4>Edit Image Preview</h4>
+        <Cropper
+          ref={cropperRef}
+          style={containerStyle}
+          src={srcImage}
+          aspectRatio={initialRatio}
+          viewMode={1}
+          guides={true}
+          crop={onCrop}
+          ready={onCrop}
+          // cropend={onCrop}
+          // initialAspectRatio={0} zoomTo={0.5} minCropBoxHeight={10} minCropBoxWidth={10}
+          // background={false} responsive={true} autoCropArea={1} checkOrientation={false}
+        />
+        <ImageRatio />
+        <Button
+          onClick={handleUpload}
+          disabled={isLoading || isUploadError ? true : false}
+        >
+          {isProcessing ? "Processing image" : "Apply Filter"}
+        </Button>
 
-          {error && <div className="text-red-700">{error.message}</div>}
+        {error && <div className="text-red-700">{error.message}</div>}
 
-          {isUploadError && (
-            <div className="text-red-700">
-              Can't save image please upload another image!
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 min-w-50 max-w-100">
-          {croppedImage && (
-            <>
-              <h4>Cropped Image Preview</h4>
-              <canvas
-                ref={croppedImageRef}
-                id="cropped-image"
-                className="w-100"
-              />
-            </>
-          )}
-
-          <ColorEdit croppedImageRef={croppedImageRef} />
-        </div>
+        {isUploadError && (
+          <div className="text-red-700">
+            Can't save image please upload another image!
+          </div>
+        )}
       </div>
-    </>
+      <div className="flex flex-col gap-2 min-w-50 max-w-100">
+        {croppedImage && (
+          <>
+            <h4>Cropped Image Preview</h4>
+            <canvas
+              ref={croppedImageRef}
+              id="cropped-image"
+              className="w-100"
+            />
+          </>
+        )}
+
+        <ColorEdit croppedImageRef={croppedImageRef} />
+      </div>
+    </div>
   );
 }

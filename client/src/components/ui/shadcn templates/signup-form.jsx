@@ -29,15 +29,14 @@ export function SignupForm({ className, ...props }) {
     formState: { errors },
   } = useForm();
 
-  const [registerUser, { isLoading }] = useRegisterMutation();
+  const [registerUser, { data, isLoading }] = useRegisterMutation();
 
   const rules = getRegisterValidationRules(watch);
 
   const onSubmit = async (formData) => {
     try {
-      console.log('formData: ',formData);
       const { name, username, email, mobile, password } = formData;
-      const response = await registerUser({
+      await registerUser({
         name,
         username,
         email,
@@ -45,17 +44,17 @@ export function SignupForm({ className, ...props }) {
         password,
       }).unwrap();
 
-      dispatch(setCredentials(response.data));
+      dispatch(setCredentials(data));
 
       setLocalStorageData(
         import.meta.env.VITE_ACCESSTOKEN_STORAGEKEY,
-        response.data.accessToken,
+        data.accessToken,
       );
       setLocalStorageData(
         import.meta.env.VITE_REFRESHTOKEN_STORAGEKEY,
-        response.data.refreshToken,
+        data.refreshToken,
       );
-      showSuccessToast(response.data.message);
+      showSuccessToast(data.message);
       navigate("/");
     } catch (error) {
       showErrorToast(error?.data?.message || error?.message);

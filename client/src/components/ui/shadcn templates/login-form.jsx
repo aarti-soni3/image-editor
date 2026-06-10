@@ -30,22 +30,22 @@ export function LoginForm({ className, ...props }) {
 
   const onSubmit = async (formData) => {
     try {
-      console.log('formdata :',formData);
-      const response = await login(formData).unwrap();
+      console.log("formdata :", formData);
+      const data = await login(formData).unwrap();
 
-      if (response.data) {
-        dispatch(setCredentials(response.data));
+      if (data) {
+        dispatch(setCredentials(data));
 
         setLocalStorageData(
           import.meta.env.VITE_ACCESSTOKEN_STORAGEKEY,
-          response?.data?.accessToken,
+          data?.accessToken,
         );
         setLocalStorageData(
           import.meta.env.VITE_REFRESHTOKEN_STORAGEKEY,
-          response?.data?.refreshToken,
+          data?.refreshToken,
         );
 
-        showSuccessToast(response.data?.message);
+        showSuccessToast(data?.message);
         navigate("/");
       }
     } catch (error) {
